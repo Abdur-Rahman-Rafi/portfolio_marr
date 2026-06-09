@@ -1,0 +1,407 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default Theme (Cyberpunk Green) */
+  --neon-green: #00ff9c;
+  --neon-cyan: #00e5ff;
+  --neon-red: #ff0055;
+  --neon-amber: #ffb300;
+  --neon-blue: #2979ff;
+
+  --primary-color: var(--neon-green);
+  --secondary-color: var(--neon-cyan);
+}
+
+:root[data-theme="red"] {
+  --neon-green: #ff2a2a;
+  --neon-cyan: #ff8080;
+}
+
+:root[data-theme="amber"] {
+  --neon-green: #ffb300;
+  --neon-cyan: #ffe57f;
+}
+
+:root[data-theme="blue"] {
+  --neon-green: #00e5ff;
+  --neon-cyan: #2979ff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  color: var(--neon-green);
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+}
+
+/* CRT Effect Styles */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg,
+      rgba(255, 0, 0, 0.06),
+      rgba(0, 255, 0, 0.02),
+      rgba(0, 0, 255, 0.06));
+  z-index: 100;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+.crt-flicker {
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.97;
+  }
+
+  5% {
+    opacity: 0.95;
+  }
+
+  10% {
+    opacity: 0.9;
+  }
+
+  15% {
+    opacity: 0.99;
+  }
+
+  20% {
+    opacity: 0.95;
+  }
+
+  25% {
+    opacity: 0.9;
+  }
+
+  30% {
+    opacity: 0.99;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.scanline {
+  width: 100%;
+  height: 100px;
+  z-index: 101;
+  background: linear-gradient(0deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 255, 156, 0.1) 50%,
+      rgba(0, 0, 0, 0) 100%);
+  opacity: 0.1;
+  position: absolute;
+  bottom: 0%;
+  animation: scanline 10s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline {
+  0% {
+    bottom: 100%;
+  }
+
+  100% {
+    bottom: -10%;
+  }
+}
+
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00c1;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  left: -2px;
+  text-shadow: -2px 0 #00fff9;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% {
+    clip: rect(31px, 9999px, 94px, 0);
+  }
+
+  20% {
+    clip: rect(62px, 9999px, 42px, 0);
+  }
+
+  40% {
+    clip: rect(16px, 9999px, 78px, 0);
+  }
+
+  60% {
+    clip: rect(43px, 9999px, 33px, 0);
+  }
+
+  80% {
+    clip: rect(98px, 9999px, 12px, 0);
+  }
+
+  100% {
+    clip: rect(2px, 9999px, 86px, 0);
+  }
+}
+
+@keyframes glitch-anim2 {
+  0% {
+    clip: rect(65px, 9999px, 100px, 0);
+  }
+
+  20% {
+    clip: rect(25px, 9999px, 34px, 0);
+  }
+
+  40% {
+    clip: rect(87px, 9999px, 56px, 0);
+  }
+
+  60% {
+    clip: rect(12px, 9999px, 88px, 0);
+  }
+
+  80% {
+    clip: rect(45px, 9999px, 11px, 0);
+  }
+
+  100% {
+    clip: rect(33px, 9999px, 77px, 0);
+  }
+}
+
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon-green);
+  border-radius: 3px;
+}
+
+/* Terminal Animations */
+@keyframes progress-loading {
+  0% {
+    width: 0%;
+    opacity: 0.3;
+  }
+
+  50% {
+    width: 70%;
+    opacity: 1;
+  }
+
+  100% {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+
+.terminal-progress-bar {
+  height: 2px;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 10px var(--neon-cyan);
+  animation: progress-loading 1.5s ease-in-out infinite;
+}
+
+.terminal-summary-line {
+  border-left: 2px solid var(--neon-green);
+  padding-left: 8px;
+  margin-top: 4px;
+  background: rgba(0, 255, 156, 0.05);
+}
+
+/* Hacker Sidebar Styles */
+.hacker-panel {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 255, 156, 0.2);
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(0, 255, 156, 0.05);
+  backdrop-filter: blur(4px);
+  position: relative;
+  overflow: hidden;
+}
+
+.hacker-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+  animation: scan-line-horizontal 2s linear infinite;
+}
+
+@keyframes scan-line-horizontal {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.data-stream {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--neon-green);
+  opacity: 0.6;
+  white-space: pre-wrap;
+}
+
+.status-bar-bg {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  width: 100%;
+}
+
+.status-bar-fill {
+  height: 100%;
+  background: var(--neon-green);
+  box-shadow: 0 0 5px var(--neon-green);
+  transition: width 1s ease-in-out;
+}
+
+/* Resume Paper Styles - Global Enforcement */
+.resume-paper {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 50;
+  isolation: isolate;
+}
+
+/* Resume Print Styles */
+@media print {
+
+  /* Ensure the resume modal wrapper is visible and static during print */
+  .resume-modal-wrapper {
+    position: static !important;
+    display: block !important;
+    visibility: visible !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  @page {
+    margin: 10mm;
+    /* Give browser some breathing room */
+    size: A4;
+  }
+
+  /* Reset All Styles for Print */
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+  }
+
+  /* Hide app shell */
+  body>*:not(#root) {
+    display: none !important;
+  }
+
+  nav,
+  .terminal-container,
+  .crt-overlay,
+  canvas,
+  .print-hidden,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Structural Resets */
+  #root,
+  main {
+    position: static !important;
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Force hide elements marked with print:hidden */
+  .print\:hidden,
+  [class*="print:hidden"] {
+    display: none !important;
+  }
+
+  /* Force page break before elements */
+  .break-before-page,
+  .print\:break-before-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+
+  /* Resume Paper Specifics */
+  .resume-paper {
+    position: relative !important;
+    /* Use standard width strategies to avoid horizontal spill */
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    /* Let the component handle internal padding or remove it if double-padding causes spill */
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+
+    /* Ensure no breaks inside critical elements if possible */
+    break-inside: auto;
+  }
+
+  /* Reset margins on resume sections to save space */
+  .resume-paper section {
+    break-inside: auto;
+    margin-bottom: 5mm !important;
+  }
+}
