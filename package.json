@@ -13,11 +13,13 @@
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
     "clsx": "^2.1.1",
+    "firebase": "^12.16.0",
     "framer-motion": "^11.16.1",
     "gsap": "^3.12.5",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.1",
     "tailwind-merge": "^2.6.0",
     "three": "^0.172.0"
   },

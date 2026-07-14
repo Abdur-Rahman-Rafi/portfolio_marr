@@ -6,7 +6,7 @@ const DottedPortrait = () => {
     const meshRef = useRef();
 
     // Load the texture
-    const texture = useLoader(THREE.TextureLoader, '/profile.png');
+    const texture = useLoader(THREE.TextureLoader, '/profile.jpeg');
 
     const { positions, colors, sizes } = useMemo(() => {
         if (!texture || !texture.image) {

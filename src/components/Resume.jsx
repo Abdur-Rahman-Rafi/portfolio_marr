@@ -1,8 +1,16 @@
 import React from 'react';
-import { BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION } from '../constants/content';
+import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, CONTACT as FALLBACK_CONTACT, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION } from '../constants/content';
 import { Download, X } from 'lucide-react';
 
-const Resume = ({ onClose }) => {
+const Resume = ({ 
+    onClose,
+    bio: BIO = FALLBACK_BIO,
+    skills: SKILLS = FALLBACK_SKILLS,
+    projects: PROJECTS = FALLBACK_PROJECTS,
+    contact: CONTACT = FALLBACK_CONTACT,
+    experience: EXPERIENCE = FALLBACK_EXPERIENCE,
+    education: EDUCATION = FALLBACK_EDUCATION
+}) => {
     const handlePrint = () => {
         window.print();
     };
@@ -51,7 +59,7 @@ const Resume = ({ onClose }) => {
                 {/* Resume Content - A4 Format simulation */}
                 <div
                     onClick={(e) => e.stopPropagation()}
-                    className="resume-paper w-[210mm] min-h-[297mm] bg-white text-black p-[20mm] shadow-2xl print:shadow-none print:m-0 print:w-full print:h-auto isolate pointer-events-auto"
+                    className="resume-paper w-[210mm] min-h-[297mm] bg-white text-black p-[20mm] shadow-2xl print:shadow-none print:m-0 print:w-full print:h-[297mm] print:p-[10mm] print:overflow-hidden isolate pointer-events-auto"
                     style={{ color: 'black', backgroundColor: '#ffffff', opacity: 1, zIndex: 10 }} // Ensure z-index is explicit
                 >
                     {/* Header */}
@@ -128,7 +136,7 @@ const Resume = ({ onClose }) => {
                     </section>
 
                     {/* Education */}
-                    <section className="break-before-page print:break-before-page">
+                    <section className="mb-6">
                         <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 border-b border-gray-300 pb-1 mb-3">Education</h3>
                         {EDUCATION?.map((edu, index) => (
                             <div key={index} className="flex justify-between items-start mb-3 last:mb-0 break-inside-avoid">

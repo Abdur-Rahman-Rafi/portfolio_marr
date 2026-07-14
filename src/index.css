@@ -32,10 +32,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: black;
-  color: var(--neon-green);
   font-family: 'JetBrains Mono', monospace;
-  overflow: hidden;
 }
 
 /* CRT Effect Styles */

@@ -23,6 +23,57 @@ export const SKILLS = [
     { category: "Soft Skills", items: ["Leadership", "Public Speaking", "Team Management", "Critical Thinking"] },
 ];
 
+export const CERTIFICATIONS = [
+    {
+        title: "Introduction to Cybersecurity",
+        issuer: "Cisco Networking Academy",
+        date: "2024",
+        color: "#3b82f6",
+        link: "#",
+        icon: "🛡️"
+    },
+    {
+        title: "Python for Data Science & AI",
+        issuer: "IBM / Coursera",
+        date: "2024",
+        color: "#8b5cf6",
+        link: "#",
+        icon: "🤖"
+    },
+    {
+        title: "Responsive Web Design",
+        issuer: "freeCodeCamp",
+        date: "2023",
+        color: "#06b6d4",
+        link: "#",
+        icon: "🌐"
+    },
+    {
+        title: "Linux Essentials",
+        issuer: "NDG / Cisco",
+        date: "2023",
+        color: "#10b981",
+        link: "#",
+        icon: "🐧"
+    },
+    {
+        title: "Machine Learning Specialization",
+        issuer: "DeepLearning.AI / Coursera",
+        date: "2024",
+        color: "#f59e0b",
+        link: "#",
+        icon: "🧠"
+    },
+    {
+        title: "JavaScript Algorithms & Data Structures",
+        issuer: "freeCodeCamp",
+        date: "2023",
+        color: "#ec4899",
+        link: "#",
+        icon: "⚡"
+    },
+];
+
 export const EXPERIENCE = [
     {
         role: "Cybersecurity Enthusiast & Intern",
