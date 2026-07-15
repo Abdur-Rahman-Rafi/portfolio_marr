@@ -334,13 +334,6 @@ const Portfolio = () => {
                                     style={{ border: '1px solid rgba(148,163,184,0.3)', background: 'rgba(255,255,255,0.04)' }}>
                                     <Mail size={16} /> Get in Touch
                                 </button>
-                                <div className="flex gap-2">
-                                    <a href={`mailto:${CONTACT?.email}`}
-                                        className="p-3 rounded-xl transition-all hover:-translate-y-0.5 text-slate-400 hover:text-emerald-400"
-                                        style={{ border: '1px solid rgba(148,163,184,0.2)', background: 'rgba(255,255,255,0.04)' }}>
-                                        <Mail size={18} />
-                                    </a>
-                                </div>
                             </motion.div>
                         </div>
                     </motion.div>
