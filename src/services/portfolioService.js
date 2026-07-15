@@ -40,6 +40,14 @@ export const deleteProject = async (id) => {
     await deleteDoc(doc(db, 'projects', id));
 };
 
+export const toggleProjectStar = async (id, isAdding) => {
+    const docRef = doc(db, 'projects', id);
+    const { increment } = await import('firebase/firestore');
+    await updateDoc(docRef, {
+        stars: increment(isAdding ? 1 : -1)
+    });
+};
+
 // ------------------------------------
 // SEEDING (One-time utility)
 // ------------------------------------

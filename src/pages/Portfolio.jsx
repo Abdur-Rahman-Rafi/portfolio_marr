@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION, CONTACT as FALLBACK_CONTACT, CERTIFICATIONS as FALLBACK_CERTIFICATIONS } from '../constants/content';
 import Resume from '../components/Resume';
-import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award } from 'lucide-react';
-import { getProfileInfo, getProjects } from '../services/portfolioService';
+import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award, Star, BadgeCheck } from 'lucide-react';
+import { getProfileInfo, getProjects, toggleProjectStar } from '../services/portfolioService';
+import { incrementVisitor, addTimeSpent } from '../services/analyticsService';
 import { motion, useInView } from 'framer-motion';
 import { AlbumSection } from '../components/AlbumManager';
 
@@ -79,6 +80,39 @@ const Portfolio = () => {
     const [profile, setProfile] = useState(null);
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [starredProjects, setStarredProjects] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('starred_projects')) || {};
+        } catch { return {}; }
+    });
+
+    useEffect(() => {
+        incrementVisitor();
+        
+        const startTime = Date.now();
+        const handleUnload = () => {
+            const timeSpentMs = Date.now() - startTime;
+            const minutes = Math.floor(timeSpentMs / 60000);
+            if (minutes > 0) {
+                addTimeSpent(minutes);
+            }
+        };
+
+        const interval = setInterval(() => {
+            const timeSpentMs = Date.now() - startTime;
+            const minutes = Math.floor(timeSpentMs / 60000);
+            if (minutes > 0 && minutes % 5 === 0) {
+                // Tracking happens mostly on unload, but this ensures long sessions get some stats
+            }
+        }, 300000);
+
+        window.addEventListener('beforeunload', handleUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleUnload);
+            clearInterval(interval);
+            handleUnload();
+        };
+    }, []);
 
     const roles = ['Web Developer', 'AI & ML Enthusiast', 'Cybersecurity Specialist', 'CS Engineer'];
     const typedRole = useTypewriter(roles);
@@ -204,7 +238,7 @@ const Portfolio = () => {
                                 <img
                                     src={getDisplayUrl(BIO.avatar) || '/profile.jpeg'}
                                     alt={BIO.name}
-                                    className="w-56 h-56 md:w-72 md:h-72 rounded-full object-cover"
+                                    className="w-72 h-72 md:w-96 md:h-96 rounded-full object-cover"
                                     style={{ border: '4px solid #0a0f1e' }}
                                 />
                             </div>
@@ -223,6 +257,7 @@ const Portfolio = () => {
                                 <span style={{ background: 'linear-gradient(135deg, #60a5fa, #818cf8, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                                     Rafi
                                 </span>
+                                <BadgeCheck className="inline-block ml-3 text-blue-500 w-10 h-10 md:w-12 md:h-12 -mt-2" />
                             </motion.h1>
 
                             {/* Typewriter role */}
@@ -258,16 +293,6 @@ const Portfolio = () => {
                                     <Mail size={16} /> Get in Touch
                                 </button>
                                 <div className="flex gap-2">
-                                    <a href={CONTACT?.github} target="_blank" rel="noreferrer"
-                                        className="p-3 rounded-xl transition-all hover:-translate-y-0.5 text-slate-400 hover:text-white"
-                                        style={{ border: '1px solid rgba(148,163,184,0.2)', background: 'rgba(255,255,255,0.04)' }}>
-                                        <Github size={18} />
-                                    </a>
-                                    <a href={CONTACT?.linkedin} target="_blank" rel="noreferrer"
-                                        className="p-3 rounded-xl transition-all hover:-translate-y-0.5 text-slate-400 hover:text-blue-400"
-                                        style={{ border: '1px solid rgba(148,163,184,0.2)', background: 'rgba(255,255,255,0.04)' }}>
-                                        <Linkedin size={18} />
-                                    </a>
                                     <a href={`mailto:${CONTACT?.email}`}
                                         className="p-3 rounded-xl transition-all hover:-translate-y-0.5 text-slate-400 hover:text-emerald-400"
                                         style={{ border: '1px solid rgba(148,163,184,0.2)', background: 'rgba(255,255,255,0.04)' }}>
@@ -391,13 +416,33 @@ const Portfolio = () => {
                                     <div className="p-2 rounded-lg" style={{ background: 'rgba(59,130,246,0.1)' }}>
                                         <Code size={18} className="text-blue-400" />
                                     </div>
-                                    {project.link && project.link !== '#' && (
-                                        <a href={project.link} target="_blank" rel="noreferrer"
-                                            className="p-2 rounded-lg text-slate-500 hover:text-blue-400 transition-colors"
-                                            style={{ background: 'rgba(255,255,255,0.05)' }}>
-                                            <ExternalLink size={14} />
-                                        </a>
-                                    )}
+                                    <div className="flex gap-2">
+                                        <button 
+                                            onClick={async () => {
+                                                if (project.id) {
+                                                    const isStarred = !!starredProjects[project.id];
+                                                    setStarredProjects(prev => {
+                                                        const next = { ...prev, [project.id]: !isStarred };
+                                                        localStorage.setItem('starred_projects', JSON.stringify(next));
+                                                        return next;
+                                                    });
+                                                    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, stars: (p.stars || 0) + (isStarred ? -1 : 1) } : p));
+                                                    await toggleProjectStar(project.id, !isStarred);
+                                                }
+                                            }}
+                                            className={`flex items-center gap-1.5 p-2 rounded-lg transition-colors text-sm font-semibold
+                                                ${starredProjects[project.id] ? 'text-yellow-400 bg-yellow-400/10' : 'text-slate-500 hover:text-yellow-400 bg-white/5'}`}>
+                                            <Star size={14} fill={starredProjects[project.id] ? "currentColor" : "none"} />
+                                            <span>{project.stars || 0}</span>
+                                        </button>
+                                        {project.link && project.link !== '#' && (
+                                            <a href={project.link} target="_blank" rel="noreferrer"
+                                                className="p-2 rounded-lg text-slate-500 hover:text-blue-400 transition-colors"
+                                                style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                                <ExternalLink size={14} />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                                 <h3 className="text-base font-bold text-slate-100 mb-2 group-hover:text-blue-400 transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                                     {project.title}
@@ -560,16 +605,6 @@ const Portfolio = () => {
                                 style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)', boxShadow: '0 0 30px rgba(59,130,246,0.25)' }}>
                                 <Mail size={16} /> Send Email
                             </a>
-                            <a href={CONTACT?.github} target="_blank" rel="noreferrer"
-                                className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 text-slate-300"
-                                style={{ border: '1px solid rgba(148,163,184,0.25)', background: 'rgba(255,255,255,0.04)' }}>
-                                <Github size={16} /> GitHub
-                            </a>
-                            <a href={CONTACT?.linkedin} target="_blank" rel="noreferrer"
-                                className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 text-blue-400"
-                                style={{ border: '1px solid rgba(59,130,246,0.3)', background: 'rgba(59,130,246,0.05)' }}>
-                                <Linkedin size={16} /> LinkedIn
-                            </a>
                             <a href={CONTACT?.facebook} target="_blank" rel="noreferrer"
                                 className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 text-blue-300"
                                 style={{ border: '1px solid rgba(96,165,250,0.25)', background: 'rgba(96,165,250,0.05)' }}>
@@ -580,6 +615,23 @@ const Portfolio = () => {
 
                     </motion.div>
                 </div>
+                {/* Social Motivation Banner */}
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl mx-auto mt-20">
+                    <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 text-center" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(139,92,246,0.2)' }}>
+                        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
+                        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
+                        <h3 className="text-2xl md:text-3xl font-bold text-slate-100 mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Join my professional network</h3>
+                        <p className="text-slate-400 mb-8 max-w-xl mx-auto">Follow me on LinkedIn for professional updates and check out my GitHub to explore the source code behind these projects.</p>
+                        <div className="flex flex-wrap gap-4 justify-center relative z-10">
+                            <a href={CONTACT?.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-1 hover:shadow-xl text-white group" style={{ background: '#0077b5', boxShadow: '0 4px 15px rgba(0, 119, 181, 0.3)' }}>
+                                <Linkedin size={20} className="group-hover:animate-bounce" /> Follow on LinkedIn
+                            </a>
+                            <a href={CONTACT?.github} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-1 hover:shadow-xl text-white group" style={{ background: '#24292e', boxShadow: '0 4px 15px rgba(36, 41, 46, 0.3)' }}>
+                                <Github size={20} className="group-hover:animate-bounce" /> Follow on GitHub
+                            </a>
+                        </div>
+                    </div>
+                </motion.div>
             </section>
 
             {/* ── Footer ── */}

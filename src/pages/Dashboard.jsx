@@ -8,8 +8,9 @@ import { AlbumDashboard } from '../components/AlbumManager';
 import { 
     LogOut, User, Briefcase, Code, GraduationCap, Link as LinkIcon, 
     Save, Plus, Trash2, Eye, EyeOff, ChevronDown, ChevronUp, Upload,
-    CheckCircle, XCircle, Loader, Image
+    CheckCircle, XCircle, Loader, Image, BarChart2, Star
 } from 'lucide-react';
+import { getStats } from '../services/analyticsService';
 
 // ---- Reusable Input Components ----
 const Input = ({ label, value, onChange, type = 'text', placeholder = '' }) => (
@@ -66,6 +67,7 @@ const Dashboard = () => {
     const [experience, setExperience] = useState(FALLBACK_EXPERIENCE);
     const [education, setEducation] = useState(FALLBACK_EDUCATION);
     const [projects, setProjects] = useState([]);
+    const [stats, setStats] = useState({ totalVisitors: 0, dailyVisitors: 0, totalTimeSpentMinutes: 0 });
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type });
@@ -92,6 +94,9 @@ const Dashboard = () => {
                 } else {
                     setProjects(FALLBACK_PROJECTS.map(p => ({ ...p, id: null })));
                 }
+
+                const statsData = await getStats();
+                if (statsData) setStats(statsData);
             } catch (err) {
                 console.error('Fetch error:', err);
                 showToast('Error loading data from Firebase', 'error');
@@ -229,6 +234,30 @@ const Dashboard = () => {
             </nav>
 
             <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+
+                {/* OVERVIEW & STATISTICS */}
+                <SectionCard title="Overview & Statistics" icon={<BarChart2 size={22} className="text-orange-600" />}>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-orange-50 border border-orange-100 p-4 rounded-xl text-center">
+                            <div className="text-sm font-semibold text-orange-600 mb-1">Total Visitors</div>
+                            <div className="text-2xl font-bold text-slate-800">{stats.totalVisitors || 0}</div>
+                        </div>
+                        <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-center">
+                            <div className="text-sm font-semibold text-blue-600 mb-1">Daily Visitors</div>
+                            <div className="text-2xl font-bold text-slate-800">{stats.dailyVisitors || 0}</div>
+                        </div>
+                        <div className="bg-green-50 border border-green-100 p-4 rounded-xl text-center">
+                            <div className="text-sm font-semibold text-green-600 mb-1">Total Time Spent</div>
+                            <div className="text-2xl font-bold text-slate-800">{stats.totalTimeSpentMinutes || 0} min</div>
+                        </div>
+                        <div className="bg-yellow-50 border border-yellow-100 p-4 rounded-xl text-center flex flex-col justify-center items-center">
+                            <div className="text-sm font-semibold text-yellow-600 mb-1 flex items-center gap-1"><Star size={14} /> Total Stars</div>
+                            <div className="text-2xl font-bold text-slate-800">
+                                {projects.reduce((acc, p) => acc + (p.stars || 0), 0)}
+                            </div>
+                        </div>
+                    </div>
+                </SectionCard>
 
                 {/* PROFILE INFO */}
                 <SectionCard title="Profile Information" icon={<User size={22} className="text-blue-600" />}>
