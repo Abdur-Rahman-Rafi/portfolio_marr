@@ -14,6 +14,13 @@ const Resume = ({
 }) => {
     const [isGenerating, setIsGenerating] = React.useState(false);
 
+    // Ensure external URLs have a protocol to prevent relative routing (404s)
+    const getValidUrl = (url) => {
+        if (!url || url === '#') return url;
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:')) return url;
+        return `https://${url}`;
+    };
+
     const handlePrint = async () => {
         setIsGenerating(true);
         const element = document.getElementById('resume-pdf-content');
@@ -96,9 +103,9 @@ const Resume = ({
                             <span>|</span>
                             <a href={`mailto:${CONTACT?.email}`} className="text-blue-700 hover:underline">{CONTACT?.email}</a>
                             <span>|</span>
-                            <a href={CONTACT?.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">LinkedIn</a>
+                            <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">LinkedIn</a>
                             <span>|</span>
-                            <a href={CONTACT?.github} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">GitHub</a>
+                            <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">GitHub</a>
                         </div>
                     </header>
 
@@ -154,7 +161,7 @@ const Resume = ({
                                 <p className="text-sm text-gray-700 mb-1 leading-relaxed">{project.description}</p>
                                 <div className="sm:hidden text-xs text-gray-500 font-mono mt-1 mb-1">{project.tech.join(' • ')}</div>
                                 {project.link !== '#' && (
-                                    <a href={project.link} className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-medium">View Project &rarr;</a>
+                                    <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-medium">View Project &rarr;</a>
                                 )}
                             </div>
                         ))}
