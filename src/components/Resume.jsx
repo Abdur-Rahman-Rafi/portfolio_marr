@@ -1,6 +1,7 @@
 import React from 'react';
 import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, CONTACT as FALLBACK_CONTACT, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION } from '../constants/content';
-import { Download, X } from 'lucide-react';
+import { Download, X, Loader2 } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 
 const Resume = ({ 
     onClose,
@@ -11,8 +12,29 @@ const Resume = ({
     experience: EXPERIENCE = FALLBACK_EXPERIENCE,
     education: EDUCATION = FALLBACK_EDUCATION
 }) => {
-    const handlePrint = () => {
-        window.print();
+    const [isGenerating, setIsGenerating] = React.useState(false);
+
+    const handlePrint = async () => {
+        setIsGenerating(true);
+        const element = document.getElementById('resume-pdf-content');
+        
+        // Hide UI elements during generation just in case
+        const opt = {
+            margin: 0,
+            filename: `${BIO?.name?.replace(/\s+/g, '_') || 'Resume'}_CV.pdf`,
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        try {
+            await html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error("Failed to generate PDF:", error);
+            alert("Sorry, there was an error generating the PDF.");
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     if (!BIO || !EXPERIENCE || !EDUCATION) {
@@ -44,9 +66,11 @@ const Resume = ({
                     `}</style>
                     <button
                         onClick={handlePrint}
-                        className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-black transition-all"
+                        disabled={isGenerating}
+                        className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-black transition-all disabled:opacity-75 disabled:cursor-not-allowed"
                     >
-                        <Download size={18} /> Save PDF
+                        {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                        {isGenerating ? 'Generating...' : 'Save PDF'}
                     </button>
                     <button
                         onClick={onClose}
@@ -58,6 +82,7 @@ const Resume = ({
 
                 {/* Resume Content - A4 Format simulation */}
                 <div
+                    id="resume-pdf-content"
                     onClick={(e) => e.stopPropagation()}
                     className="resume-paper w-[210mm] min-h-[297mm] bg-white text-black p-[20mm] shadow-2xl print:shadow-none print:m-0 print:w-full print:h-[297mm] print:p-[10mm] print:overflow-hidden isolate pointer-events-auto"
                     style={{ color: 'black', backgroundColor: '#ffffff', opacity: 1, zIndex: 10 }} // Ensure z-index is explicit
