@@ -17,8 +17,9 @@ const Resume = ({
     // Ensure external URLs have a protocol to prevent relative routing (404s)
     const getValidUrl = (url) => {
         if (!url || url === '#') return url;
-        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:')) return url;
-        return `https://${url}`;
+        const trimmedUrl = url.trim();
+        if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('mailto:')) return trimmedUrl;
+        return `https://${trimmedUrl}`;
     };
 
     const handlePrint = async () => {
