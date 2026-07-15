@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION, CONTACT as FALLBACK_CONTACT, CERTIFICATIONS as FALLBACK_CERTIFICATIONS } from '../constants/content';
 import Resume from '../components/Resume';
-import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award, Star, BadgeCheck } from 'lucide-react';
+import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award, Star, BadgeCheck, Menu, X } from 'lucide-react';
 import { getProfileInfo, getProjects, toggleProjectStar } from '../services/portfolioService';
 import { incrementVisitor, addTimeSpent } from '../services/analyticsService';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { AlbumSection } from '../components/AlbumManager';
 
 // ── Typewriter Hook ──────────────────────────────────────────
@@ -75,6 +75,7 @@ const categoryColors = {
 // ── Main Component ───────────────────────────────────────────
 const Portfolio = () => {
     const [showResume, setShowResume] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showBackTop, setShowBackTop] = useState(false);
     const [activeSection, setActiveSection] = useState('home');
     const [profile, setProfile] = useState(null);
@@ -217,11 +218,44 @@ const Portfolio = () => {
                             </button>
                         ))}
                     </div>
-                    <button onClick={() => setShowResume(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-blue-400 border border-blue-500/40 hover:bg-blue-500/10 transition-all">
-                        <Download size={15} /> Resume
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => setShowResume(true)}
+                            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-blue-400 border border-blue-500/40 hover:bg-blue-500/10 transition-all">
+                            <Download size={15} /> Resume
+                        </button>
+                        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            className="md:hidden text-slate-300 hover:text-white p-2 transition-colors">
+                            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                    </div>
                 </div>
+
+                {/* Mobile Menu Dropdown */}
+                <AnimatePresence>
+                    {mobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="md:hidden border-t border-blue-500/10 overflow-hidden"
+                            style={{ background: 'rgba(10,15,30,0.95)' }}
+                        >
+                            <div className="px-6 py-4 flex flex-col gap-2">
+                                {navLinks.map(link => (
+                                    <button key={link.id} 
+                                        onClick={() => { scrollTo(link.id); setMobileMenuOpen(false); }}
+                                        className={`px-4 py-3 rounded-xl text-sm font-medium text-left transition-all ${activeSection === link.id ? 'text-blue-400 bg-blue-500/10' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}>
+                                        {link.label}
+                                    </button>
+                                ))}
+                                <button onClick={() => { setShowResume(true); setMobileMenuOpen(false); }}
+                                    className="mt-2 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-semibold text-blue-400 border border-blue-500/40 hover:bg-blue-500/10 transition-all">
+                                    <Download size={16} /> Download Resume
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </nav>
 
             {/* ── Hero Section ── */}
