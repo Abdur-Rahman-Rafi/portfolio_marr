@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION, CONTACT as FALLBACK_CONTACT, CERTIFICATIONS as FALLBACK_CERTIFICATIONS } from '../constants/content';
+import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION, CONTACT as FALLBACK_CONTACT, CERTIFICATIONS as FALLBACK_CERTIFICATIONS, RESEARCH_PAPERS as FALLBACK_RESEARCH_PAPERS } from '../constants/content';
 import Resume from '../components/Resume';
-import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award, Star, BadgeCheck, Menu, X } from 'lucide-react';
+import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award, Star, BadgeCheck, Menu, X, BookOpen } from 'lucide-react';
 import { getProfileInfo, getProjects, toggleProjectStar } from '../services/portfolioService';
 import { incrementVisitor, addTimeSpent } from '../services/analyticsService';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
@@ -154,7 +154,7 @@ const Portfolio = () => {
     useEffect(() => {
         const onScroll = () => {
             setShowBackTop(window.scrollY > 400);
-            const sections = ['home', 'about', 'skills', 'projects', 'experience', 'education', 'contact'];
+            const sections = ['home', 'about', 'skills', 'projects', 'experience', 'education', 'certifications', 'research', 'contact'];
             for (const id of [...sections].reverse()) {
                 const el = document.getElementById(id);
                 if (el && window.scrollY >= el.offsetTop - 120) { setActiveSection(id); break; }
@@ -174,6 +174,7 @@ const Portfolio = () => {
     const EXPERIENCE = profile?.experience || FALLBACK_EXPERIENCE;
     const EDUCATION = profile?.education || FALLBACK_EDUCATION;
     const CONTACT = profile?.contact || FALLBACK_CONTACT;
+    const RESEARCH_PAPERS = profile?.researchPapers || FALLBACK_RESEARCH_PAPERS;
 
     if (loading) {
         return (
@@ -195,6 +196,7 @@ const Portfolio = () => {
         { id: 'experience', label: 'Experience' },
         { id: 'education', label: 'Education' },
         { id: 'certifications', label: 'Certifications' },
+        { id: 'research', label: 'Research' },
         { id: 'contact', label: 'Contact' },
     ];
 
@@ -607,6 +609,50 @@ const Portfolio = () => {
                                             <Award size={11} /> Verified
                                         </span>
                                     )}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Research Papers Section ── */}
+            <section id="research" className="relative z-10 py-24 px-6">
+                <div className="max-w-6xl mx-auto">
+                    <SectionHeader icon={<BookOpen size={22} />} title="Research Papers" color="#ec4899" />
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {RESEARCH_PAPERS.map((paper, idx) => (
+                            <motion.div key={idx}
+                                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                                transition={{ delay: idx * 0.15 }}
+                                className="group rounded-2xl p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl relative overflow-hidden"
+                                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                <div className="absolute top-0 left-0 right-0 h-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    style={{ background: 'linear-gradient(90deg, #ec4899, #f43f5e)' }} />
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-2 rounded-lg" style={{ background: 'rgba(236,72,153,0.1)' }}>
+                                        <BookOpen size={18} className="text-pink-400" />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <span className={`text-xs font-mono px-3 py-1 rounded-full ${paper.status === 'Published' ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20' : 'text-amber-400 bg-amber-400/10 border border-amber-400/20'}`}>
+                                            {paper.status}
+                                        </span>
+                                        {paper.link && paper.link !== '#' && (
+                                            <a href={getValidUrl(paper.link)} target="_blank" rel="noreferrer"
+                                                className="p-2 rounded-lg text-slate-500 hover:text-pink-400 transition-colors flex items-center justify-center"
+                                                style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                                <ExternalLink size={14} />
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-pink-400 transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                                    {paper.title}
+                                </h3>
+                                <p className="text-slate-400 text-sm leading-relaxed mb-4">{paper.description}</p>
+                                <div className="flex flex-col gap-1 mt-auto">
+                                    <div className="text-xs font-medium text-slate-300"><span className="text-slate-500">Venue:</span> {paper.venue}</div>
+                                    <div className="text-xs font-medium text-slate-300"><span className="text-slate-500">Year:</span> {paper.date}</div>
                                 </div>
                             </motion.div>
                         ))}

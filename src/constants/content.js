@@ -186,3 +186,22 @@ export const BOOT_LOGS = [
     "[ OK ] Access granted. Entering RAFI_SYSTEM.",
     "READY FOR INPUT."
 ];
+
+export const RESEARCH_PAPERS = [
+    {
+        title: "Spinal Abnormality Detection Using Advanced Machine Learning Models",
+        status: "Published",
+        venue: "IEEE International Conference on Machine Learning",
+        date: "2024",
+        link: "#",
+        description: "A comprehensive study on utilizing predictive modeling and deep learning techniques to accurately identify spinal abnormalities from medical imaging data."
+    },
+    {
+        title: "A Novel Approach to Secure VPN Configurations in Linux Environments",
+        status: "Unpublished",
+        venue: "N/A",
+        date: "2024",
+        link: "#",
+        description: "Exploring advanced server hardening and secure VPN deployment strategies to mitigate unauthorized access attempts effectively."
+    }
+];
