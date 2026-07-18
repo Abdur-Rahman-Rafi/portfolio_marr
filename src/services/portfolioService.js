@@ -1,6 +1,6 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION } from '../constants/content';
+import { BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION, RESEARCH_PAPERS } from '../constants/content';
 
 // ------------------------------------
 // READ OPERATIONS
@@ -58,7 +58,8 @@ export const seedDatabaseWithConstants = async () => {
         contact: CONTACT,
         skills: SKILLS,
         experience: EXPERIENCE,
-        education: EDUCATION
+        education: EDUCATION,
+        researchPapers: RESEARCH_PAPERS
     });
     
     // Seed Projects

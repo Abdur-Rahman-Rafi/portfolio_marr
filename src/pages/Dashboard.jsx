@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, CONTACT as FALLBACK_CONTACT, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION } from '../constants/content';
+import { doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, CONTACT as FALLBACK_CONTACT, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION, RESEARCH_PAPERS as FALLBACK_RESEARCH_PAPERS } from '../constants/content';
 import { AlbumDashboard } from '../components/AlbumManager';
 import { 
     LogOut, User, Briefcase, Code, GraduationCap, Link as LinkIcon, 
     Save, Plus, Trash2, Eye, EyeOff, ChevronDown, ChevronUp, Upload,
-    CheckCircle, XCircle, Loader, Image, BarChart2, Star
+    CheckCircle, XCircle, Loader, Image, BarChart2, Star, BookOpen
 } from 'lucide-react';
 import { getStats } from '../services/analyticsService';
 
@@ -66,6 +66,7 @@ const Dashboard = () => {
     const [skills, setSkills] = useState(FALLBACK_SKILLS);
     const [experience, setExperience] = useState(FALLBACK_EXPERIENCE);
     const [education, setEducation] = useState(FALLBACK_EDUCATION);
+    const [researchPapers, setResearchPapers] = useState(FALLBACK_RESEARCH_PAPERS);
     const [projects, setProjects] = useState([]);
     const [stats, setStats] = useState({ totalVisitors: 0, dailyVisitors: 0, totalTimeSpentMinutes: 0 });
 
@@ -86,6 +87,7 @@ const Dashboard = () => {
                     if (d.skills) setSkills(d.skills);
                     if (d.experience) setExperience(d.experience);
                     if (d.education) setEducation(d.education);
+                    if (d.researchPapers) setResearchPapers(d.researchPapers);
                 }
 
                 const projSnap = await getDocs(collection(db, 'projects'));
@@ -95,8 +97,7 @@ const Dashboard = () => {
                     setProjects(FALLBACK_PROJECTS.map(p => ({ ...p, id: null })));
                 }
 
-                const statsData = await getStats();
-                if (statsData) setStats(statsData);
+                // stats fetched via onSnapshot
             } catch (err) {
                 console.error('Fetch error:', err);
                 showToast('Error loading data from Firebase', 'error');
@@ -105,11 +106,27 @@ const Dashboard = () => {
         fetchAll();
     }, []);
 
+    // ---- Real-time Stats Listener ----
+    useEffect(() => {
+        const unsubscribe = onSnapshot(doc(db, 'portfolio', 'stats'), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const today = new Date().toISOString().split('T')[0];
+                if (data.lastDate !== today) {
+                    setStats({ ...data, dailyVisitors: 0 });
+                } else {
+                    setStats(data);
+                }
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
     // ---- Save profile to Firebase ----
     const saveProfile = async () => {
         setSaving(true);
         try {
-            await setDoc(doc(db, 'portfolio', 'profile'), { bio, contact, skills, experience, education }, { merge: true });
+            await setDoc(doc(db, 'portfolio', 'profile'), { bio, contact, skills, experience, education, researchPapers }, { merge: true });
             showToast('Profile saved successfully!');
         } catch (err) {
             showToast('Error saving profile', 'error');
@@ -125,7 +142,8 @@ const Dashboard = () => {
         try {
             await setDoc(doc(db, 'portfolio', 'profile'), {
                 bio: FALLBACK_BIO, contact: FALLBACK_CONTACT, skills: FALLBACK_SKILLS,
-                experience: FALLBACK_EXPERIENCE, education: FALLBACK_EDUCATION
+                experience: FALLBACK_EXPERIENCE, education: FALLBACK_EDUCATION,
+                researchPapers: FALLBACK_RESEARCH_PAPERS
             });
             const projSnap = await getDocs(collection(db, 'projects'));
             if (projSnap.empty) {
@@ -142,6 +160,7 @@ const Dashboard = () => {
                 if (d.skills) setSkills(d.skills);
                 if (d.experience) setExperience(d.experience);
                 if (d.education) setEducation(d.education);
+                if (d.researchPapers) setResearchPapers(d.researchPapers);
             }
             const ps = await getDocs(collection(db, 'projects'));
             setProjects(ps.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -202,6 +221,12 @@ const Dashboard = () => {
         setEducation(prev => [...prev, { institution: '', degree: '', duration: '', description: '' }]);
     };
     const removeEducation = (idx) => setEducation(prev => prev.filter((_, i) => i !== idx));
+
+    // ---- Research Papers CRUD ----
+    const addResearchPaper = () => {
+        setResearchPapers(prev => [...prev, { title: '', status: 'Published', venue: '', date: '', link: '#', description: '' }]);
+    };
+    const removeResearchPaper = (idx) => setResearchPapers(prev => prev.filter((_, i) => i !== idx));
 
     return (
         <div className="min-h-screen bg-slate-100 font-sans">
@@ -389,6 +414,42 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </SectionCard>
+
+                {/* RESEARCH PAPERS */}
+                <SectionCard title="Research Papers" icon={<BookOpen size={22} className="text-pink-600" />}>
+                    <div className="space-y-6">
+                        {researchPapers.map((paper, idx) => (
+                            <div key={idx} className="border border-slate-200 rounded-xl p-5 bg-slate-50 relative">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold text-slate-800">{paper.title || `Research Paper ${idx + 1}`}</h3>
+                                    <button onClick={() => removeResearchPaper(idx)}
+                                        className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-all">
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <Input label="Title" value={paper.title} onChange={e => setResearchPapers(prev => prev.map((x, i) => i === idx ? { ...x, title: e.target.value } : x))} />
+                                    <Input label="Status (Published / Unpublished)" value={paper.status} onChange={e => setResearchPapers(prev => prev.map((x, i) => i === idx ? { ...x, status: e.target.value } : x))} />
+                                    <Input label="Venue / Journal" value={paper.venue} onChange={e => setResearchPapers(prev => prev.map((x, i) => i === idx ? { ...x, venue: e.target.value } : x))} />
+                                    <Input label="Year / Date" value={paper.date} onChange={e => setResearchPapers(prev => prev.map((x, i) => i === idx ? { ...x, date: e.target.value } : x))} />
+                                    <Input label="Link" value={paper.link} onChange={e => setResearchPapers(prev => prev.map((x, i) => i === idx ? { ...x, link: e.target.value } : x))} />
+                                </div>
+                                <Textarea label="Description / Abstract" value={paper.description} onChange={e => setResearchPapers(prev => prev.map((x, i) => i === idx ? { ...x, description: e.target.value } : x))} rows={3} />
+                            </div>
+                        ))}
+                        <button onClick={addResearchPaper}
+                            className="flex items-center gap-2 w-full py-3 rounded-xl border-2 border-dashed border-slate-300 hover:border-pink-400 text-slate-500 hover:text-pink-600 font-semibold justify-center transition-all text-sm">
+                            <Plus size={18} /> Add Research Paper
+                        </button>
+                        <div className="flex justify-end pt-2">
+                            <button onClick={saveProfile} disabled={saving}
+                                className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all">
+                                <Save size={16} /> Save Research Papers
+                            </button>
+                        </div>
+                    </div>
+                </SectionCard>
+
                 {/* ALBUM & ACHIEVEMENTS */}
                 <SectionCard title="Album & Achievements" icon={<Image size={22} className="text-amber-500" />} defaultOpen={false}>
                     <p className="text-sm text-slate-500 mb-5">Upload photos, achievement certificates, awards and more. Click the image box to upload a file. Toggle visibility with the eye icon. Changes save individually per item.</p>
