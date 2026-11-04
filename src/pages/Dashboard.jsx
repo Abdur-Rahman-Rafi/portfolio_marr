@@ -82,8 +82,26 @@ const Dashboard = () => {
                 const profileSnap = await getDoc(doc(db, 'portfolio', 'profile'));
                 if (profileSnap.exists()) {
                     const d = profileSnap.data();
-                    if (d.bio) setBio(d.bio);
-                    if (d.contact) setContact(d.contact);
+                    const addr = (d.contact && d.contact.address) || (d.bio && (d.bio.address || d.bio.location)) || FALLBACK_BIO.location || '';
+                    const phoneVal = (d.contact && (d.contact.phone || d.contact.contactNo)) || '';
+
+                    if (d.bio) {
+                        setBio({
+                            ...FALLBACK_BIO,
+                            ...d.bio,
+                            location: d.bio.location || addr,
+                            address: d.bio.address || d.bio.location || addr,
+                        });
+                    }
+                    if (d.contact) {
+                        setContact({
+                            ...FALLBACK_CONTACT,
+                            ...d.contact,
+                            phone: phoneVal,
+                            contactNo: phoneVal,
+                            address: addr,
+                        });
+                    }
                     if (d.skills) setSkills(d.skills);
                     if (d.experience) setExperience(d.experience);
                     if (d.education) setEducation(d.education);
@@ -126,9 +144,30 @@ const Dashboard = () => {
     const saveProfile = async () => {
         setSaving(true);
         try {
-            await setDoc(doc(db, 'portfolio', 'profile'), { bio, contact, skills, experience, education, researchPapers }, { merge: true });
+            const updatedBio = {
+                ...bio,
+                location: bio.address || bio.location || '',
+                address: bio.address || bio.location || '',
+            };
+            const updatedContact = {
+                ...contact,
+                phone: contact.phone || contact.contactNo || '',
+                contactNo: contact.phone || contact.contactNo || '',
+                address: contact.address || updatedBio.address || '',
+            };
+            await setDoc(doc(db, 'portfolio', 'profile'), {
+                bio: updatedBio,
+                contact: updatedContact,
+                skills,
+                experience,
+                education,
+                researchPapers
+            }, { merge: true });
+            setBio(updatedBio);
+            setContact(updatedContact);
             showToast('Profile saved successfully!');
         } catch (err) {
+            console.error('Save error:', err);
             showToast('Error saving profile', 'error');
         } finally {
             setSaving(false);
@@ -155,8 +194,10 @@ const Dashboard = () => {
             const profileSnap = await getDoc(doc(db, 'portfolio', 'profile'));
             if (profileSnap.exists()) {
                 const d = profileSnap.data();
-                if (d.bio) setBio(d.bio);
-                if (d.contact) setContact(d.contact);
+                const addr = (d.contact && d.contact.address) || (d.bio && (d.bio.address || d.bio.location)) || FALLBACK_BIO.location || '';
+                const phoneVal = (d.contact && (d.contact.phone || d.contact.contactNo)) || '';
+                if (d.bio) setBio({ ...FALLBACK_BIO, ...d.bio, address: addr });
+                if (d.contact) setContact({ ...FALLBACK_CONTACT, ...d.contact, phone: phoneVal, contactNo: phoneVal, address: addr });
                 if (d.skills) setSkills(d.skills);
                 if (d.experience) setExperience(d.experience);
                 if (d.education) setEducation(d.education);
@@ -292,7 +333,11 @@ const Dashboard = () => {
                     <div className="grid md:grid-cols-2 gap-4">
                         <Input label="Full Name" value={bio.name} onChange={e => setBio(p => ({ ...p, name: e.target.value }))} />
                         <Input label="Role / Title" value={bio.role} onChange={e => setBio(p => ({ ...p, role: e.target.value }))} />
-                        <Input label="Location" value={bio.location} onChange={e => setBio(p => ({ ...p, location: e.target.value }))} />
+                        <Input label="Location / Address" value={bio.address ?? bio.location ?? ''} onChange={e => {
+                            const val = e.target.value;
+                            setBio(p => ({ ...p, location: val, address: val }));
+                            setContact(p => ({ ...p, address: val }));
+                        }} />
                     </div>
                     <Textarea label="Summary" value={bio.summary} onChange={e => setBio(p => ({ ...p, summary: e.target.value }))} rows={2} />
                     <Textarea label="Detailed Bio" value={bio.detailed} onChange={e => setBio(p => ({ ...p, detailed: e.target.value }))} rows={4} />
@@ -301,7 +346,16 @@ const Dashboard = () => {
                 {/* CONTACT / SOCIAL LINKS */}
                 <SectionCard title="Contact & Social Links" icon={<LinkIcon size={22} className="text-indigo-600" />}>
                     <div className="grid md:grid-cols-2 gap-4">
-                        <Input label="Email" value={contact.email} onChange={e => setContact(p => ({ ...p, email: e.target.value }))} type="email" />
+                        <Input label="Contact No / Phone" value={contact.phone ?? ''} onChange={e => {
+                            const val = e.target.value;
+                            setContact(p => ({ ...p, phone: val, contactNo: val }));
+                        }} placeholder="+880 1XXXXXXXXX" type="tel" />
+                        <Input label="Email" value={contact.email ?? ''} onChange={e => setContact(p => ({ ...p, email: e.target.value }))} type="email" />
+                        <Input label="Address" value={contact.address ?? ''} onChange={e => {
+                            const val = e.target.value;
+                            setContact(p => ({ ...p, address: val }));
+                            setBio(p => ({ ...p, address: val, location: val }));
+                        }} placeholder="e.g. Dhaka, Bangladesh" />
                         <Input label="GitHub URL" value={contact.github} onChange={e => setContact(p => ({ ...p, github: e.target.value }))} />
                         <Input label="LinkedIn URL" value={contact.linkedin} onChange={e => setContact(p => ({ ...p, linkedin: e.target.value }))} />
                         <Input label="Facebook URL" value={contact.facebook} onChange={e => setContact(p => ({ ...p, facebook: e.target.value }))} />

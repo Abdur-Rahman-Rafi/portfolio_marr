@@ -2,6 +2,7 @@ export const BIO = {
     name: "Abdur Rahman Rafi",
     role: "AI & ML Enthusiast | Web Developer | Cybersecurity Enthusiast",
     location: "Dhaka, Bangladesh",
+    address: "Dhaka, Bangladesh",
     summary: "Software Developer and Cybersecurity Enthusiast with experience in building secure web applications, AI-powered systems, and enterprise-grade digital solutions.",
     detailed: `Skilled in React, Node.js, Python, Linux, and network security fundamentals, with a proven ability to combine development expertise and security best practices to deliver reliable, user-focused applications.`,
 };
@@ -168,6 +169,9 @@ export const PROJECTS = [
 ];
 
 export const CONTACT = {
+    phone: "",
+    contactNo: "",
+    address: "Dhaka, Bangladesh",
     email: "arafi223437@bscse.uiu.ac.bd",
     github: "https://github.com/Abdur-Rahman-Rafi",
     linkedin: "https://www.linkedin.com/in/rafi1438/",

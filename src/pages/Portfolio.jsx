@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BIO as FALLBACK_BIO, SKILLS as FALLBACK_SKILLS, PROJECTS as FALLBACK_PROJECTS, EXPERIENCE as FALLBACK_EXPERIENCE, EDUCATION as FALLBACK_EDUCATION, CONTACT as FALLBACK_CONTACT, CERTIFICATIONS as FALLBACK_CERTIFICATIONS, RESEARCH_PAPERS as FALLBACK_RESEARCH_PAPERS } from '../constants/content';
 import Resume from '../components/Resume';
-import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award, Star, BadgeCheck, Menu, X, BookOpen } from 'lucide-react';
+import { Download, Mail, ExternalLink, Github, Linkedin, Briefcase, Code, ChevronRight, MapPin, GraduationCap, ArrowUp, Facebook, Terminal, Shield, Cpu, Globe, Award, Star, BadgeCheck, Menu, X, BookOpen, Phone } from 'lucide-react';
 import { getProfileInfo, getProjects, toggleProjectStar } from '../services/portfolioService';
 import { incrementVisitor, addTimeSpent } from '../services/analyticsService';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
@@ -382,7 +382,7 @@ const Portfolio = () => {
                         <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
                             className="space-y-4">
                             {[
-                                { icon: <MapPin size={16} />, label: 'Location', value: BIO.location || 'Dhaka, Bangladesh' },
+                                { icon: <MapPin size={16} />, label: 'Location', value: BIO.address || BIO.location || 'Dhaka, Bangladesh' },
                                 { icon: <GraduationCap size={16} />, label: 'University', value: 'United International University' },
                                 { icon: <Briefcase size={16} />, label: 'Degree', value: 'B.Sc. in CS & Engineering' },
                                 { icon: <Terminal size={16} />, label: 'Focus', value: 'AI · ML · Web · Cybersecurity' },
@@ -680,6 +680,13 @@ const Portfolio = () => {
                             Whether it's a web app, an AI system, or a security audit — I'm always open to new challenges and collaborations.
                         </p>
                         <div className="flex flex-wrap gap-4 justify-center">
+                            {(CONTACT?.phone || CONTACT?.contactNo) && (
+                                <a href={`tel:${CONTACT?.phone || CONTACT?.contactNo}`}
+                                    className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg text-white"
+                                    style={{ background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 0 30px rgba(16,185,129,0.25)' }}>
+                                    <Phone size={16} /> {CONTACT?.phone || CONTACT?.contactNo}
+                                </a>
+                            )}
                             <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT?.email}`}
                                 target="_blank" rel="noreferrer"
                                 className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg text-white"

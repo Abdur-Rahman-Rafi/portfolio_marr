@@ -123,7 +123,7 @@ FUN:
   Link: ${p.link}`).join('\n\n');
                 break;
             case 'contact':
-                response = `EMAIL: ${CONTACT.email}\nGITHUB: ${CONTACT.github}\nLINKEDIN: ${CONTACT.linkedin}\nFACEBOOK: ${CONTACT.facebook}`;
+                response = `${(CONTACT.phone || CONTACT.contactNo) ? `PHONE: ${CONTACT.phone || CONTACT.contactNo}\n` : ''}${CONTACT.address ? `ADDRESS: ${CONTACT.address}\n` : ''}EMAIL: ${CONTACT.email}\nGITHUB: ${CONTACT.github}\nLINKEDIN: ${CONTACT.linkedin}\nFACEBOOK: ${CONTACT.facebook}`;
                 break;
             case 'resume':
                 response = 'GENERATING SECURE DOCUMENT... [OPENING PREVIEW]';

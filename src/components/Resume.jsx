@@ -99,14 +99,36 @@ const Resume = ({
                     <header className="border-b-[3px] border-gray-900 pb-6 mb-8 print:pb-3 print:mb-4">
                         <h1 className="text-4xl font-extrabold uppercase tracking-tight text-gray-900 mb-2 print:text-3xl print:mb-1">{BIO?.name || "Name"}</h1>
                         <p className="text-xl font-medium text-gray-600 mb-4 print:text-lg print:mb-2">{BIO?.role || "Role"}</p>
-                        <div className="flex flex-wrap text-sm text-gray-600 gap-y-2 gap-x-4 font-medium print:text-xs print:gap-x-3">
-                            <span className="flex items-center gap-1">{BIO?.location}</span>
-                            <span>|</span>
-                            <a href={`mailto:${CONTACT?.email}`} className="text-blue-700 hover:underline">{CONTACT?.email}</a>
-                            <span>|</span>
-                            <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">LinkedIn</a>
-                            <span>|</span>
-                            <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">GitHub</a>
+                        <div className="flex flex-wrap text-sm text-gray-600 gap-y-2 gap-x-4 font-medium print:text-xs print:gap-x-3 items-center">
+                            {(BIO?.address || BIO?.location || CONTACT?.address) && (
+                                <span className="flex items-center gap-1">{BIO?.address || BIO?.location || CONTACT?.address}</span>
+                            )}
+                            {(CONTACT?.phone || CONTACT?.contactNo) && (
+                                <>
+                                    {(BIO?.address || BIO?.location || CONTACT?.address) && <span>|</span>}
+                                    <a href={`tel:${CONTACT?.phone || CONTACT?.contactNo}`} className="text-blue-700 hover:underline">
+                                        {CONTACT?.phone || CONTACT?.contactNo}
+                                    </a>
+                                </>
+                            )}
+                            {CONTACT?.email && (
+                                <>
+                                    {((BIO?.address || BIO?.location || CONTACT?.address) || (CONTACT?.phone || CONTACT?.contactNo)) && <span>|</span>}
+                                    <a href={`mailto:${CONTACT?.email}`} className="text-blue-700 hover:underline">{CONTACT?.email}</a>
+                                </>
+                            )}
+                            {CONTACT?.linkedin && (
+                                <>
+                                    <span>|</span>
+                                    <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">LinkedIn</a>
+                                </>
+                            )}
+                            {CONTACT?.github && (
+                                <>
+                                    <span>|</span>
+                                    <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">GitHub</a>
+                                </>
+                            )}
                         </div>
                     </header>
 
