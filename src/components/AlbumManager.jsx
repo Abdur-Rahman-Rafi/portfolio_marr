@@ -27,16 +27,16 @@ const AlbumItemEditor = ({ item, onSave, onDelete, onToggleHide }) => {
     };
 
     return (
-        <div className="border border-slate-200 rounded-2xl p-5 bg-white shadow-sm space-y-4">
-            <div className="flex justify-between items-start gap-4">
+        <div className="border border-slate-200 rounded-2xl p-4 sm:p-5 bg-white shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                 {/* Image preview */}
-                <div className="relative w-28 h-28 rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-50 flex items-center justify-center shrink-0">
+                <div className="relative w-full sm:w-28 h-40 sm:h-28 rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-50 flex items-center justify-center shrink-0">
                     {localItem.imageUrl
                         ? <img src={getDisplayUrl(localItem.imageUrl)} alt="" className="w-full h-full object-cover" />
                         : <Image size={28} className="text-slate-400" />}
                 </div>
 
-                <div className="flex-1 space-y-3">
+                <div className="w-full sm:flex-1 space-y-3">
                     <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 bg-white">
                         <div className="px-3 text-slate-400"><LinkIcon size={16} /></div>
                         <input
@@ -62,7 +62,7 @@ const AlbumItemEditor = ({ item, onSave, onDelete, onToggleHide }) => {
                     <select
                         value={localItem.type || 'photo'}
                         onChange={e => setLocalItem(p => ({ ...p, type: e.target.value }))}
-                        className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full sm:w-auto border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     >
                         <option value="photo">📸 Photo</option>
                         <option value="achievement">🏆 Achievement</option>
@@ -71,17 +71,17 @@ const AlbumItemEditor = ({ item, onSave, onDelete, onToggleHide }) => {
                     </select>
                 </div>
 
-                <div className="flex flex-col gap-2 shrink-0">
+                <div className="flex flex-row sm:flex-col justify-end gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                     <button onClick={() => onToggleHide(localItem)} title={localItem.hidden ? 'Show' : 'Hide'}
-                        className={`p-2 rounded-xl transition-all ${localItem.hidden ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                        className={`flex-1 sm:flex-initial p-2 rounded-xl transition-all flex items-center justify-center ${localItem.hidden ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
                         {localItem.hidden ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                     <button onClick={handleSave} disabled={saving}
-                        className="p-2 rounded-xl bg-blue-100 text-blue-700 hover:bg-blue-200 transition-all">
+                        className="flex-1 sm:flex-initial p-2 rounded-xl bg-blue-100 text-blue-700 hover:bg-blue-200 transition-all flex items-center justify-center">
                         {saving ? <Loader size={16} className="animate-spin" /> : <Save size={16} />}
                     </button>
                     <button onClick={() => onDelete(localItem)}
-                        className="p-2 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 transition-all">
+                        className="flex-1 sm:flex-initial p-2 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 transition-all flex items-center justify-center">
                         <Trash2 size={16} />
                     </button>
                 </div>
@@ -169,31 +169,31 @@ export const AlbumSection = () => {
     if (items.length === 0) return null;
 
     return (
-        <section className="py-24 px-6 bg-gradient-to-b from-slate-50 to-white">
+        <section className="py-20 sm:py-24 px-4 sm:px-6 relative z-10" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
             <div className="max-w-6xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="flex items-center gap-4 mb-6 justify-center"
+                    className="flex items-center gap-3 sm:gap-4 mb-6 justify-center"
                 >
-                    <Trophy className="text-amber-500" size={32} />
-                    <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">Album & Achievements</h2>
+                    <Trophy className="text-amber-400" size={28} />
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight">Album & Achievements</h2>
                 </motion.div>
 
                 {/* Filter Pills */}
-                <div className="flex gap-2 flex-wrap justify-center mb-12">
+                <div className="flex gap-2 flex-wrap justify-center mb-10 px-2">
                     {filters.map(f => (
                         <button key={f} onClick={() => setFilter(f)}
-                            className={`px-4 py-1.5 rounded-full text-sm font-semibold capitalize transition-all
-                                ${filter === f ? 'bg-blue-600 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600'}`}>
+                            className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold capitalize transition-all
+                                ${filter === f ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-800/80 border border-slate-700/60 text-slate-300 hover:border-blue-400 hover:text-white'}`}>
                             {f === 'all' ? '✨ All' : `${typeIcon(f)} ${f}`}
                         </button>
                     ))}
                 </div>
 
                 {/* Grid */}
-                <motion.div layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                <motion.div layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                     <AnimatePresence>
                         {filtered.map((item, idx) => (
                             <motion.div
@@ -204,17 +204,17 @@ export const AlbumSection = () => {
                                 exit={{ opacity: 0, scale: 0.8 }}
                                 transition={{ delay: idx * 0.05 }}
                                 onClick={() => setSelected(item)}
-                                className="group relative cursor-pointer rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white border border-slate-100 aspect-square"
+                                className="group relative cursor-pointer rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 aspect-square"
                             >
                                 {item.imageUrl
                                     ? <img src={getDisplayUrl(item.imageUrl)} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                    : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-4xl">{typeIcon(item.type)}</div>
+                                    : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900/30 to-indigo-900/30 text-4xl">{typeIcon(item.type)}</div>
                                 }
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                                    <span className="text-xs text-white/80 font-semibold uppercase tracking-wider mb-1">{typeLabel(item.type)}</span>
-                                    <p className="text-white font-bold text-sm leading-tight">{item.title}</p>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 sm:p-4">
+                                    <span className="text-[10px] sm:text-xs text-blue-300 font-semibold uppercase tracking-wider mb-1">{typeLabel(item.type)}</span>
+                                    <p className="text-white font-bold text-xs sm:text-sm leading-tight line-clamp-2">{item.title}</p>
                                 </div>
-                                <div className="absolute top-3 right-3 text-lg">{typeIcon(item.type)}</div>
+                                <div className="absolute top-2.5 right-2.5 text-base sm:text-lg">{typeIcon(item.type)}</div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -227,7 +227,7 @@ export const AlbumSection = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                            className="fixed inset-0 z-[300] bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
                             onClick={() => setSelected(null)}
                         >
                             <motion.div
@@ -235,20 +235,22 @@ export const AlbumSection = () => {
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.85, opacity: 0 }}
                                 onClick={e => e.stopPropagation()}
-                                className="bg-white rounded-3xl overflow-hidden max-w-2xl w-full shadow-2xl"
+                                className="bg-slate-900 border border-slate-700/80 rounded-3xl overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl text-slate-100"
                             >
                                 {selected.imageUrl && (
-                                    <img src={getDisplayUrl(selected.imageUrl)} alt={selected.title} className="w-full max-h-96 object-cover" />
+                                    <div className="relative overflow-hidden bg-black shrink-0">
+                                        <img src={getDisplayUrl(selected.imageUrl)} alt={selected.title} className="w-full max-h-72 sm:max-h-96 object-contain mx-auto" />
+                                    </div>
                                 )}
-                                <div className="p-6">
+                                <div className="p-5 sm:p-6 overflow-y-auto">
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm font-bold text-blue-600 uppercase tracking-wider">{typeIcon(selected.type)} {typeLabel(selected.type)}</span>
-                                        <button onClick={() => setSelected(null)} className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+                                        <span className="text-xs sm:text-sm font-bold text-blue-400 uppercase tracking-wider">{typeIcon(selected.type)} {typeLabel(selected.type)}</span>
+                                        <button onClick={() => setSelected(null)} className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
                                             <X size={20} />
                                         </button>
                                     </div>
-                                    <h3 className="text-2xl font-extrabold text-slate-900 mb-2">{selected.title}</h3>
-                                    {selected.caption && <p className="text-slate-600 leading-relaxed">{selected.caption}</p>}
+                                    <h3 className="text-xl sm:text-2xl font-extrabold text-slate-100 mb-2">{selected.title}</h3>
+                                    {selected.caption && <p className="text-slate-300 leading-relaxed text-xs sm:text-sm">{selected.caption}</p>}
                                 </div>
                             </motion.div>
                         </motion.div>

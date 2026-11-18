@@ -282,7 +282,7 @@ const Portfolio = () => {
                                 <img
                                     src={getDisplayUrl(BIO.avatar) || '/profile.jpeg'}
                                     alt={BIO.name}
-                                    className="w-72 h-72 md:w-96 md:h-96 rounded-full object-cover"
+                                    className="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 rounded-full object-cover"
                                     style={{ border: '4px solid #0a0f1e' }}
                                 />
                             </div>
@@ -296,12 +296,12 @@ const Portfolio = () => {
                                 <Terminal size={12} /> {'<'} Computer Science & Engineering {'>'}
                             </motion.div>
 
-                            <motion.h1 variants={fadeUp} className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-3 leading-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                            <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-3 leading-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                                 <span className="text-slate-100">Hi, I'm </span>
                                 <span style={{ background: 'linear-gradient(135deg, #60a5fa, #818cf8, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                                     Rafi
                                 </span>
-                                <BadgeCheck className="inline-block ml-3 text-blue-500 w-10 h-10 md:w-12 md:h-12 -mt-2" />
+                                <BadgeCheck className="inline-block ml-2 text-blue-500 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 -mt-1 sm:-mt-2" />
                             </motion.h1>
 
                             {/* Typewriter role */}
@@ -325,14 +325,14 @@ const Portfolio = () => {
                                 {BIO.summary}
                             </motion.p>
 
-                            <motion.div variants={fadeUp} className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start w-full sm:w-auto">
                                 <button onClick={() => setShowResume(true)}
-                                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg w-full sm:w-auto"
                                     style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)', boxShadow: '0 0 20px rgba(59,130,246,0.3)', color: '#fff' }}>
                                     <Download size={16} /> Download Resume
                                 </button>
                                 <button onClick={() => scrollTo('contact')}
-                                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 text-slate-300"
+                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 text-slate-300 w-full sm:w-auto"
                                     style={{ border: '1px solid rgba(148,163,184,0.3)', background: 'rgba(255,255,255,0.04)' }}>
                                     <Mail size={16} /> Get in Touch
                                 </button>
@@ -503,15 +503,15 @@ const Portfolio = () => {
             <section id="experience" className="relative z-10 py-24 px-6" style={{ background: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="max-w-4xl mx-auto">
                     <SectionHeader icon={<Briefcase size={22} />} title="Experience" color="#10b981" />
-                    <div className="relative pl-8" style={{ borderLeft: '2px solid rgba(59,130,246,0.25)' }}>
+                    <div className="relative pl-6 sm:pl-8" style={{ borderLeft: '2px solid rgba(59,130,246,0.25)' }}>
                         {EXPERIENCE.map((exp, idx) => (
                             <motion.div key={idx}
                                 initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
                                 transition={{ delay: idx * 0.15 }}
                                 className="relative mb-10 last:mb-0">
                                 {/* Timeline dot */}
-                                <div className="absolute -left-11 top-1 w-4 h-4 rounded-full border-2 border-blue-500 bg-[#0a0f1e]" />
-                                <div className="p-6 rounded-2xl transition-all hover:bg-white/5"
+                                <div className="absolute -left-[31px] sm:-left-[41px] top-1 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-blue-500 bg-[#0a0f1e]" />
+                                <div className="p-4 sm:p-6 rounded-2xl transition-all hover:bg-white/5"
                                     style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
                                         <div>
@@ -679,22 +679,22 @@ const Portfolio = () => {
                         <p className="text-slate-400 text-lg mb-10 leading-relaxed">
                             Whether it's a web app, an AI system, or a security audit — I'm always open to new challenges and collaborations.
                         </p>
-                        <div className="flex flex-wrap gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center">
                             {(CONTACT?.phone || CONTACT?.contactNo) && (
                                 <a href={`tel:${CONTACT?.phone || CONTACT?.contactNo}`}
-                                    className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg text-white"
+                                    className="flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg text-white w-full sm:w-auto"
                                     style={{ background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 0 30px rgba(16,185,129,0.25)' }}>
                                     <Phone size={16} /> {CONTACT?.phone || CONTACT?.contactNo}
                                 </a>
                             )}
                             <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT?.email}`}
                                 target="_blank" rel="noreferrer"
-                                className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg text-white"
+                                className="flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg text-white w-full sm:w-auto"
                                 style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)', boxShadow: '0 0 30px rgba(59,130,246,0.25)' }}>
                                 <Mail size={16} /> Send Email
                             </a>
                             <a href={getValidUrl(CONTACT?.facebook)} target="_blank" rel="noreferrer"
-                                className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 text-blue-300"
+                                className="flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 text-blue-300 w-full sm:w-auto"
                                 style={{ border: '1px solid rgba(96,165,250,0.25)', background: 'rgba(96,165,250,0.05)' }}>
                                 <Facebook size={16} /> Facebook
                             </a>
@@ -705,17 +705,17 @@ const Portfolio = () => {
                 </div>
                 {/* Social Motivation Banner */}
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl mx-auto mt-20">
-                    <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 text-center" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(139,92,246,0.2)' }}>
+                    <div className="relative rounded-3xl overflow-hidden p-6 sm:p-8 md:p-12 text-center" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(139,92,246,0.2)' }}>
                         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
                         <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
-                        <h3 className="text-2xl md:text-3xl font-bold text-slate-100 mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Join my professional network</h3>
-                        <p className="text-slate-400 mb-8 max-w-xl mx-auto">Follow me on LinkedIn for professional updates and check out my GitHub to explore the source code behind these projects.</p>
-                        <div className="flex flex-wrap gap-4 justify-center relative z-10">
-                            <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-1 hover:shadow-xl text-white group" style={{ background: '#0077b5', boxShadow: '0 4px 15px rgba(0, 119, 181, 0.3)' }}>
-                                <Linkedin size={20} className="group-hover:animate-bounce" /> Follow on LinkedIn
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-100 mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Join my professional network</h3>
+                        <p className="text-slate-400 mb-8 max-w-xl mx-auto text-sm sm:text-base">Follow me on LinkedIn for professional updates and check out my GitHub to explore the source code behind these projects.</p>
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center relative z-10">
+                            <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold transition-all hover:-translate-y-1 hover:shadow-xl text-white group w-full sm:w-auto text-sm sm:text-base" style={{ background: '#0077b5', boxShadow: '0 4px 15px rgba(0, 119, 181, 0.3)' }}>
+                                <Linkedin size={18} className="group-hover:animate-bounce" /> Follow on LinkedIn
                             </a>
-                            <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-1 hover:shadow-xl text-white group" style={{ background: '#24292e', boxShadow: '0 4px 15px rgba(36, 41, 46, 0.3)' }}>
-                                <Github size={20} className="group-hover:animate-bounce" /> Follow on GitHub
+                            <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold transition-all hover:-translate-y-1 hover:shadow-xl text-white group w-full sm:w-auto text-sm sm:text-base" style={{ background: '#24292e', boxShadow: '0 4px 15px rgba(36, 41, 46, 0.3)' }}>
+                                <Github size={18} className="group-hover:animate-bounce" /> Follow on GitHub
                             </a>
                         </div>
                     </div>

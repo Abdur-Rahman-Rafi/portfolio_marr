@@ -1,6 +1,6 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION, RESEARCH_PAPERS } from '../constants/content';
+import { BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION, RESEARCH_PAPERS, DEFAULT_CV_PROFILES } from '../constants/content';
 
 // ------------------------------------
 // READ OPERATIONS
@@ -46,6 +46,24 @@ export const toggleProjectStar = async (id, isAdding) => {
     await updateDoc(docRef, {
         stars: increment(isAdding ? 1 : -1)
     });
+};
+
+export const getCvProfiles = async () => {
+    try {
+        const docRef = doc(db, 'portfolio', 'cv_profiles');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().profiles?.length > 0) {
+            return docSnap.data().profiles;
+        }
+    } catch (e) {
+        console.warn('Failed to fetch CV profiles from Firestore, using defaults:', e);
+    }
+    return DEFAULT_CV_PROFILES;
+};
+
+export const updateCvProfiles = async (profiles) => {
+    const docRef = doc(db, 'portfolio', 'cv_profiles');
+    await setDoc(docRef, { profiles, updatedAt: new Date().toISOString() }, { merge: true });
 };
 
 // ------------------------------------

@@ -209,3 +209,40 @@ export const RESEARCH_PAPERS = [
         description: "Exploring advanced server hardening and secure VPN deployment strategies to mitigate unauthorized access attempts effectively."
     }
 ];
+
+export const DEFAULT_CV_PROFILES = [
+    {
+        id: "software",
+        name: "Software & Web Engineering",
+        badge: "Tech / Software",
+        role: "Full-Stack Software Developer",
+        summary: "Goal-oriented Software Developer with a solid foundation in React, Node.js, Python, and RESTful architectures. Proven track record building responsive web applications, secure authentication workflows, and scalable database schemas. Passionate about writing clean, maintainable code and solving complex computational challenges.",
+        skillsCategories: ["Web Development", "Tools & Core", "Security & Systems"],
+        featuredProjectTitles: ["EduSync", "Prescribo", "BAFSK Math Club Portal"],
+        featuredExperienceRoles: ["Web Developer", "Former President & Web Developer", "Cybersecurity Enthusiast & Intern"],
+        customKeywords: "React, Node.js, Next.js, Python, REST APIs, Git, Tailwind CSS, MongoDB, Full-Stack Architecture"
+    },
+    {
+        id: "banking",
+        name: "Banking & Enterprise IT",
+        badge: "Bank / Enterprise",
+        role: "IT Officer / Enterprise Systems Specialist",
+        summary: "Computer Science graduate with expertise in database management (MySQL, MongoDB), enterprise network security, and structured application development. Experienced in handling data-driven workflows, system reliability, user authentication, and server uptime. Strong analytical acumen with proven organizational leadership experience.",
+        skillsCategories: ["Tools & Core", "Security & Systems", "Web Development", "Soft Skills"],
+        featuredProjectTitles: ["UIU CGPA & Scholarship Calculator", "BAFSK Math Club Portal", "EduSync"],
+        featuredExperienceRoles: ["Former President & Web Developer", "Cybersecurity Enthusiast & Intern", "Web Developer"],
+        customKeywords: "Database Management, MySQL, Network Administration, Linux Security, System Auditing, Problem Solving, Leadership"
+    },
+    {
+        id: "cybersecurity",
+        name: "Cybersecurity & Systems",
+        badge: "Security / Infra",
+        role: "Cybersecurity Analyst & Systems Specialist",
+        summary: "Security-focused technologist with hands-on experience in vulnerability assessment, penetration testing, and Linux server hardening. Cisco certified in Cybersecurity with practical expertise in remediating OWASP web vulnerabilities, securing VPN infrastructure, and implementing defense-in-depth protocols.",
+        skillsCategories: ["Security & Systems", "Tools & Core", "Web Development"],
+        featuredProjectTitles: ["BAFSK Math Club Portal", "Prescribo", "Spinal Abnormality Detection"],
+        featuredExperienceRoles: ["Cybersecurity Enthusiast & Intern", "Former President & Web Developer", "Web Developer"],
+        customKeywords: "Vulnerability Assessment, Penetration Testing, Linux Hardening, Network Security, Cisco Certified, VPN Setup"
+    }
+];
+
