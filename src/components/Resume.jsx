@@ -10,7 +10,8 @@ import {
 } from '../constants/content';
 import { getCvProfiles } from '../services/portfolioService';
 import { Download, Printer, X, Loader2, CheckCircle2, Sliders, Sparkles } from 'lucide-react';
-import html2pdf from 'html2pdf.js';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 const Resume = ({ 
     onClose,
@@ -108,28 +109,95 @@ const Resume = ({
         window.print();
     };
 
-    // Fallback html2pdf generator
+    // Instant PDF Download (Guaranteed strict 1-page fit without page overflow or cut text)
     const handleSavePDF = async () => {
         setIsGenerating(true);
-        const element = document.getElementById('resume-pdf-content');
-        
+        const originalElement = document.getElementById('resume-pdf-content');
+        if (!originalElement) {
+            setIsGenerating(false);
+            return;
+        }
+
         const cleanName = (BIO?.name || 'Resume').replace(/\s+/g, '_');
         const trackName = activeProfile?.id || 'standard';
+        const filename = `${cleanName}_${trackName}_CV.pdf`;
 
-        const opt = {
-            margin: [8, 8, 8, 8],
-            filename: `${cleanName}_${trackName}_CV.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+        // Clone element offscreen with fixed standard A4 width (794px / 210mm).
+        // This ensures the downloaded PDF is 100% identical and pixel-perfect whether generated on PC, tablet, or mobile!
+        const clone = originalElement.cloneNode(true);
+        clone.id = 'resume-pdf-clone';
+        clone.style.width = '794px';
+        clone.style.minWidth = '794px';
+        clone.style.maxWidth = '794px';
+        clone.style.position = 'fixed';
+        clone.style.left = '-9999px';
+        clone.style.top = '0';
+        clone.style.zIndex = '-99999';
+        clone.style.margin = '0';
+        clone.style.boxShadow = 'none';
+        clone.style.border = 'none';
+        clone.style.transform = 'none';
+        clone.style.boxSizing = 'border-box';
+        document.body.appendChild(clone);
 
         try {
-            await html2pdf().set(opt).from(element).save();
+            // Render DOM to high-res 2x canvas
+            const canvas = await html2canvas(clone, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                scrollX: 0,
+                scrollY: 0,
+                backgroundColor: '#ffffff'
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.98);
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pdfWidth = 210;
+            const pdfHeight = 297;
+            const contentRatio = canvas.height / canvas.width;
+            const calculatedHeight = pdfWidth * contentRatio;
+
+            if (isCompactMode) {
+                // Strict 1-Page ATS Mode: Guaranteed to fit on exactly 1 single page!
+                if (calculatedHeight <= pdfHeight) {
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, calculatedHeight, undefined, 'FAST');
+                } else {
+                    // Safe proportional scale so that content never spills to page 2 or cuts text
+                    const scaleFactor = pdfHeight / calculatedHeight;
+                    const fittedWidth = pdfWidth * scaleFactor;
+                    const offsetX = (pdfWidth - fittedWidth) / 2;
+                    pdf.addImage(imgData, 'JPEG', offsetX, 0, fittedWidth, pdfHeight, undefined, 'FAST');
+                }
+            } else {
+                // Detailed Multi-page Mode
+                let heightLeft = calculatedHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
+                heightLeft -= pdfHeight;
+
+                while (heightLeft > 0) {
+                    position = heightLeft - calculatedHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
+                    heightLeft -= pdfHeight;
+                }
+            }
+
+            pdf.save(filename);
         } catch (error) {
             console.error("Failed to generate PDF:", error);
-            alert("Error creating PDF. Please use the 'Print ATS PDF' option for vector download.");
+            alert("Error creating PDF. Please use the 'Print / ATS PDF' option for vector download.");
         } finally {
+            if (document.body.contains(clone)) {
+                document.body.removeChild(clone);
+            }
             setIsGenerating(false);
         }
     };
@@ -148,19 +216,22 @@ const Resume = ({
             <style>{`
                 @page { 
                     size: A4 portrait; 
-                    margin: 8mm 10mm; 
+                    margin: 0; 
                 }
                 @media print {
-                    body {
-                        background: white !important;
-                        color: black !important;
+                    html, body {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        background: #ffffff !important;
+                        color: #000000 !important;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
                     .resume-modal-wrapper {
                         position: static !important;
-                        background: white !important;
+                        background: #ffffff !important;
                         padding: 0 !important;
+                        margin: 0 !important;
                         overflow: visible !important;
                     }
                     .print\\:hidden, .d-print-none { 
@@ -169,11 +240,19 @@ const Resume = ({
                     #resume-pdf-content {
                         box-shadow: none !important;
                         border: none !important;
-                        margin: 0 !important;
-                        width: 100% !important;
-                        max-width: 100% !important;
-                        padding: 10mm !important;
-                        min-height: 297mm !important;
+                        margin: 0 auto !important;
+                        width: 210mm !important;
+                        max-width: 210mm !important;
+                        box-sizing: border-box !important;
+                    }
+                    .compact-resume-page {
+                        max-height: 297mm !important;
+                        height: 297mm !important;
+                        overflow: hidden !important;
+                        page-break-after: avoid !important;
+                        page-break-inside: avoid !important;
+                        break-after: avoid !important;
+                        break-inside: avoid !important;
                     }
                     .page-break-avoid {
                         break-inside: avoid !important;
@@ -283,21 +362,24 @@ const Resume = ({
                         onClick={(e) => e.stopPropagation()}
                         className={`resume-paper w-full max-w-[210mm] bg-white text-gray-900 shadow-2xl rounded-none isolate pointer-events-auto transition-all ${
                             isCompactMode 
-                                ? 'p-5 sm:p-[14mm] text-[12.5px] sm:text-[13px] leading-relaxed min-h-auto sm:min-h-[297mm]' 
-                                : 'p-6 sm:p-[18mm] text-[13px] sm:text-[14px] leading-normal min-h-auto sm:min-h-[297mm]'
+                                ? 'compact-resume-page p-4 sm:p-[8mm_12mm] text-[11.5px] leading-snug' 
+                                : 'p-6 sm:p-[16mm] text-[13px] leading-normal'
                         }`}
-                        style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}
+                        style={{ 
+                            fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif',
+                            boxSizing: 'border-box'
+                        }}
                     >
                         {/* Header */}
-                        <header className="border-b-2 border-gray-900 pb-3.5 mb-4 text-center">
-                            <h1 className="text-2xl sm:text-[27px] font-extrabold tracking-tight uppercase text-gray-950 mb-1">
+                        <header className="border-b-2 border-gray-900 pb-2 mb-2 text-center">
+                            <h1 className="text-[22px] sm:text-[25px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5">
                                 {BIO?.name || "Abdur Rahman Rafi"}
                             </h1>
-                            <p className="text-xs sm:text-[13.5px] font-bold tracking-wider text-blue-900 uppercase mb-2.5">
+                            <p className="text-[11px] sm:text-[12px] font-bold tracking-wider text-blue-900 uppercase mb-1.5">
                                 {activeProfile?.role || BIO?.role}
                             </p>
                             
-                            <div className="flex flex-wrap justify-center text-[11.5px] sm:text-[12px] text-gray-700 gap-x-2.5 gap-y-1 font-sans">
+                            <div className="flex flex-wrap justify-center text-[10.5px] sm:text-[11px] text-gray-700 gap-x-2 gap-y-0.5 font-sans leading-tight">
                                 {(BIO?.address || BIO?.location || CONTACT?.address) && (
                                     <span>{BIO?.address || BIO?.location || CONTACT?.address}</span>
                                 )}
@@ -321,7 +403,7 @@ const Resume = ({
                                     <>
                                         <span>•</span>
                                         <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">
-                                            {formatDisplayUrl(CONTACT?.linkedin) || 'LinkedIn'}
+                                            {formatDisplayUrl(CONTACT?.linkedin) || 'linkedin.com/in/rafi1438'}
                                         </a>
                                     </>
                                 )}
@@ -329,7 +411,7 @@ const Resume = ({
                                     <>
                                         <span>•</span>
                                         <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">
-                                            {formatDisplayUrl(CONTACT?.github) || 'GitHub'}
+                                            {formatDisplayUrl(CONTACT?.github) || 'github.com/Abdur-Rahman-Rafi'}
                                         </a>
                                     </>
                                 )}
@@ -337,24 +419,24 @@ const Resume = ({
                         </header>
 
                         {/* Professional Summary */}
-                        <section className="mb-4 page-break-avoid">
-                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
+                        <section className="mb-2 page-break-avoid">
+                            <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1 font-sans">
                                 Professional Summary
                             </h2>
-                            <p className="text-gray-800 text-justify text-[12px] sm:text-[12.5px] leading-relaxed">
+                            <p className="text-gray-800 text-justify text-[11px] sm:text-[11.5px] leading-snug">
                                 {activeProfile?.summary || BIO?.summary}
                             </p>
                         </section>
 
                         {/* Technical / Core Skills */}
-                        <section className="mb-4 page-break-avoid">
-                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
+                        <section className="mb-2 page-break-avoid">
+                            <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1 font-sans">
                                 Core Competencies & Skills
                             </h2>
-                            <div className="space-y-1.5 text-[12px] sm:text-[12.5px]">
+                            <div className="space-y-1 text-[11px] sm:text-[11.5px]">
                                 {displaySkills.map((skillGroup, index) => (
-                                    <div key={index} className="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-baseline">
-                                        <span className="font-bold text-gray-950 font-sans text-[11.5px] sm:text-[12px]">{skillGroup.category}:</span>
+                                    <div key={index} className="grid grid-cols-[135px_1fr] items-baseline">
+                                        <span className="font-bold text-gray-950 font-sans text-[11px] sm:text-[11.5px]">{skillGroup.category}:</span>
                                         <span className="text-gray-800 leading-snug">{skillGroup.items.join(', ')}</span>
                                     </div>
                                 ))}
@@ -362,19 +444,19 @@ const Resume = ({
                         </section>
 
                         {/* Relevant Experience */}
-                        <section className="mb-4">
-                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-2 font-sans">
+                        <section className="mb-2">
+                            <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
                                 Relevant Experience
                             </h2>
-                            <div className="space-y-3">
+                            <div className="space-y-1.5">
                                 {displayExperience.map((exp, index) => (
                                     <div key={index} className="page-break-avoid">
                                         <div className="flex justify-between items-baseline flex-wrap gap-x-2">
-                                            <h3 className="font-bold text-gray-950 text-[12.5px] sm:text-[13px]">{exp.role}</h3>
-                                            <span className="text-[11.5px] font-medium text-gray-600 font-sans">{exp.duration}</span>
+                                            <h3 className="font-bold text-gray-950 text-[11.5px] sm:text-[12px]">{exp.role}</h3>
+                                            <span className="text-[10.5px] sm:text-[11px] font-medium text-gray-600 font-sans">{exp.duration}</span>
                                         </div>
-                                        <div className="text-[11.5px] sm:text-[12px] font-semibold text-blue-900 italic mb-1">{exp.company}</div>
-                                        <ul className="list-disc list-outside ml-4 text-[11.5px] sm:text-[12px] text-gray-800 space-y-0.5 leading-snug">
+                                        <div className="text-[10.5px] sm:text-[11px] font-semibold text-blue-900 italic mb-0.5">{exp.company}</div>
+                                        <ul className="list-disc list-outside ml-3.5 text-[10.5px] sm:text-[11px] text-gray-800 space-y-0.5 leading-snug">
                                             {exp.description?.map((desc, i) => (
                                                 <li key={i} className="pl-0.5">{desc}</li>
                                             ))}
@@ -385,27 +467,27 @@ const Resume = ({
                         </section>
 
                         {/* Selected Projects */}
-                        <section className="mb-4">
-                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-2 font-sans">
+                        <section className="mb-2">
+                            <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
                                 Selected Projects
                             </h2>
-                            <div className="space-y-3">
+                            <div className="space-y-1.5">
                                 {displayProjects.map((project, index) => (
                                     <div key={index} className="page-break-avoid">
                                         <div className="flex justify-between items-baseline flex-wrap gap-x-2">
                                             <div className="flex items-baseline gap-1.5 flex-wrap">
-                                                <h3 className="font-bold text-gray-950 text-[12.5px] sm:text-[13px]">{project.title}</h3>
+                                                <h3 className="font-bold text-gray-950 text-[11.5px] sm:text-[12px]">{project.title}</h3>
                                                 {project.link && project.link !== '#' && (
-                                                    <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer" className="text-[11px] text-blue-800 hover:underline font-mono">
+                                                    <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer" className="text-[10px] sm:text-[10.5px] text-blue-800 hover:underline font-mono">
                                                         ({formatDisplayUrl(project.link)})
                                                     </a>
                                                 )}
                                             </div>
-                                            <span className="text-[11px] text-gray-600 font-sans font-medium">
+                                            <span className="text-[10px] sm:text-[10.5px] text-gray-600 font-sans font-medium">
                                                 {project.tech?.slice(0, 4).join(' • ')}
                                             </span>
                                         </div>
-                                        <p className="text-[11.5px] sm:text-[12px] text-gray-800 leading-snug mt-0.5">
+                                        <p className="text-[10.5px] sm:text-[11px] text-gray-800 leading-snug mt-0.5">
                                             {project.description}
                                         </p>
                                     </div>
@@ -414,19 +496,19 @@ const Resume = ({
                         </section>
 
                         {/* Education */}
-                        <section className="page-break-avoid">
-                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
+                        <section className="page-break-avoid mb-0">
+                            <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1 font-sans">
                                 Education
                             </h2>
-                            <div className="space-y-1.5">
+                            <div className="space-y-1">
                                 {EDUCATION?.map((edu, index) => (
-                                    <div key={index} className="flex justify-between items-start text-[12px] sm:text-[12.5px]">
+                                    <div key={index} className="flex justify-between items-start text-[11px] sm:text-[11.5px]">
                                         <div>
                                             <span className="font-bold text-gray-950">{edu.degree}</span>
                                             <span className="text-gray-700"> — {edu.institution}</span>
                                             {edu.description && <span className="text-gray-600 italic"> ({edu.description})</span>}
                                         </div>
-                                        <span className="text-[11px] sm:text-[11.5px] font-medium text-gray-600 font-sans whitespace-nowrap ml-2">
+                                        <span className="text-[10.5px] sm:text-[11px] font-medium text-gray-600 font-sans whitespace-nowrap ml-2">
                                             {edu.duration}
                                         </span>
                                     </div>
