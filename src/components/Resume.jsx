@@ -132,9 +132,9 @@ const Resume = ({
         element.style.maxWidth = '794px';
 
         try {
-            // Render the live DOM element with high-resolution 2.5x sharpness (lossless 240 DPI)
+            // Render the live DOM element with integer 2x sharpness (lossless crisp rendering)
             const canvas = await html2canvas(element, {
-                scale: 2.5,
+                scale: 2,
                 useCORS: true,
                 logging: false,
                 scrollX: 0,
@@ -180,42 +180,6 @@ const Resume = ({
                     pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
                     heightLeft -= pdfHeight;
                 }
-            }
-
-            // Embed an invisible vector text layer for ATS parsers (Taleo, Workday, Jobscan, ResumeWorded)
-            try {
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(1);
-                let textY = 10;
-                const appendAtsLine = (text) => {
-                    if (!text) return;
-                    pdf.text(String(text), 10, textY);
-                    textY += 1.2;
-                };
-
-                appendAtsLine(BIO?.name || "Abdur Rahman Rafi");
-                appendAtsLine(activeProfile?.role || BIO?.role);
-                appendAtsLine(`${BIO?.address || 'Dhaka, Bangladesh'} | ${CONTACT?.phone || '+880 1700-000000'} | ${CONTACT?.email} | ${CONTACT?.linkedin} | ${CONTACT?.github}`);
-                appendAtsLine("PROFESSIONAL SUMMARY");
-                appendAtsLine(activeProfile?.summary || BIO?.summary);
-                appendAtsLine("TECHNICAL SKILLS");
-                displaySkills.forEach(s => appendAtsLine(`${s.category}: ${s.items.join(', ')}`));
-                appendAtsLine("PROFESSIONAL EXPERIENCE");
-                displayExperience.forEach(exp => {
-                    appendAtsLine(`${exp.role} | ${exp.company} | ${exp.duration}`);
-                    exp.description?.forEach(d => appendAtsLine(`- ${d}`));
-                });
-                appendAtsLine("TECHNICAL PROJECTS");
-                displayProjects.forEach(p => {
-                    appendAtsLine(`${p.title} | ${p.tech?.join(', ')} | ${p.link}`);
-                    appendAtsLine(p.description);
-                });
-                appendAtsLine("EDUCATION");
-                EDUCATION?.forEach(edu => {
-                    appendAtsLine(`${edu.degree} | ${edu.institution} | ${edu.duration} | ${edu.description || ''}`);
-                });
-            } catch (atsErr) {
-                console.warn("Could not embed ATS text stream:", atsErr);
             }
 
             pdf.save(filename);
