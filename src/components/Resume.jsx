@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
     BIO as FALLBACK_BIO, 
     SKILLS as FALLBACK_SKILLS, 
@@ -109,11 +110,11 @@ const Resume = ({
         window.print();
     };
 
-    // Instant PDF Download (Guaranteed strict 1-page fit without page overflow or cut text)
+    // Instant PDF Download (Guaranteed strict 1-page fit matching on-screen design 1:1)
     const handleSavePDF = async () => {
         setIsGenerating(true);
-        const originalElement = document.getElementById('resume-pdf-content');
-        if (!originalElement) {
+        const element = document.getElementById('resume-pdf-content');
+        if (!element) {
             setIsGenerating(false);
             return;
         }
@@ -122,28 +123,18 @@ const Resume = ({
         const trackName = activeProfile?.id || 'standard';
         const filename = `${cleanName}_${trackName}_CV.pdf`;
 
-        // Clone element offscreen with fixed standard A4 width (794px / 210mm).
-        // This ensures the downloaded PDF is 100% identical and pixel-perfect whether generated on PC, tablet, or mobile!
-        const clone = originalElement.cloneNode(true);
-        clone.id = 'resume-pdf-clone';
-        clone.style.width = '794px';
-        clone.style.minWidth = '794px';
-        clone.style.maxWidth = '794px';
-        clone.style.position = 'fixed';
-        clone.style.left = '-9999px';
-        clone.style.top = '0';
-        clone.style.zIndex = '-99999';
-        clone.style.margin = '0';
-        clone.style.boxShadow = 'none';
-        clone.style.border = 'none';
-        clone.style.transform = 'none';
-        clone.style.boxSizing = 'border-box';
-        document.body.appendChild(clone);
+        // Temporarily lock exact standard A4 width so mobile or responsive wrapping doesn't alter layout
+        const prevWidth = element.style.width;
+        const prevMaxWidth = element.style.maxWidth;
+        const prevMinWidth = element.style.minWidth;
+        element.style.width = '794px';
+        element.style.minWidth = '794px';
+        element.style.maxWidth = '794px';
 
         try {
-            // Render DOM to high-res 2x canvas
-            const canvas = await html2canvas(clone, {
-                scale: 2,
+            // Render the live DOM element with high-resolution 2.5x sharpness (lossless 240 DPI)
+            const canvas = await html2canvas(element, {
+                scale: 2.5,
                 useCORS: true,
                 logging: false,
                 scrollX: 0,
@@ -151,7 +142,8 @@ const Resume = ({
                 backgroundColor: '#ffffff'
             });
 
-            const imgData = canvas.toDataURL('image/jpeg', 0.98);
+            // Use lossless PNG to eliminate JPEG compression blur and color degradation
+            const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
@@ -164,28 +156,28 @@ const Resume = ({
             const calculatedHeight = pdfWidth * contentRatio;
 
             if (isCompactMode) {
-                // Strict 1-Page ATS Mode: Guaranteed to fit on exactly 1 single page!
+                // Strict 1-Page ATS Mode: Fits naturally without side margins or distortion
                 if (calculatedHeight <= pdfHeight) {
-                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, calculatedHeight, undefined, 'FAST');
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, calculatedHeight, undefined, 'FAST');
                 } else {
-                    // Safe proportional scale so that content never spills to page 2 or cuts text
+                    // Safe proportional fit if content slightly exceeds A4
                     const scaleFactor = pdfHeight / calculatedHeight;
                     const fittedWidth = pdfWidth * scaleFactor;
                     const offsetX = (pdfWidth - fittedWidth) / 2;
-                    pdf.addImage(imgData, 'JPEG', offsetX, 0, fittedWidth, pdfHeight, undefined, 'FAST');
+                    pdf.addImage(imgData, 'PNG', offsetX, 0, fittedWidth, pdfHeight, undefined, 'FAST');
                 }
             } else {
                 // Detailed Multi-page Mode
                 let heightLeft = calculatedHeight;
                 let position = 0;
 
-                pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
                 heightLeft -= pdfHeight;
 
                 while (heightLeft > 0) {
                     position = heightLeft - calculatedHeight;
                     pdf.addPage();
-                    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
                     heightLeft -= pdfHeight;
                 }
             }
@@ -195,9 +187,9 @@ const Resume = ({
             console.error("Failed to generate PDF:", error);
             alert("Error creating PDF. Please use the 'Print / ATS PDF' option for vector download.");
         } finally {
-            if (document.body.contains(clone)) {
-                document.body.removeChild(clone);
-            }
+            element.style.width = prevWidth;
+            element.style.minWidth = prevMinWidth;
+            element.style.maxWidth = prevMaxWidth;
             setIsGenerating(false);
         }
     };
@@ -210,8 +202,8 @@ const Resume = ({
         );
     }
 
-    return (
-        <div className="fixed inset-0 z-[200] overflow-y-auto font-sans print:static print:bg-white print:h-auto print:overflow-visible resume-modal-wrapper bg-slate-900/80 backdrop-blur-sm">
+    return createPortal(
+        <div id="resume-modal-portal" className="fixed inset-0 z-[200] overflow-y-auto font-sans print:static print:bg-white print:h-auto print:overflow-visible resume-modal-wrapper bg-slate-900/80 backdrop-blur-sm">
             {/* Print CSS Rules */}
             <style>{`
                 @page { 
@@ -219,6 +211,13 @@ const Resume = ({
                     margin: 0; 
                 }
                 @media print {
+                    /* Hide everything else on the entire website */
+                    body > *:not(#resume-modal-portal) {
+                        display: none !important;
+                    }
+                    #root {
+                        display: none !important;
+                    }
                     html, body {
                         margin: 0 !important;
                         padding: 0 !important;
@@ -227,11 +226,13 @@ const Resume = ({
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
-                    .resume-modal-wrapper {
+                    #resume-modal-portal {
+                        display: block !important;
                         position: static !important;
+                        width: 100% !important;
                         background: #ffffff !important;
-                        padding: 0 !important;
                         margin: 0 !important;
+                        padding: 0 !important;
                         overflow: visible !important;
                     }
                     .print\\:hidden, .d-print-none { 
@@ -243,6 +244,7 @@ const Resume = ({
                         margin: 0 auto !important;
                         width: 210mm !important;
                         max-width: 210mm !important;
+                        padding: 8mm 12mm !important;
                         box-sizing: border-box !important;
                     }
                     .compact-resume-page {
@@ -519,7 +521,8 @@ const Resume = ({
             </div>
 
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
