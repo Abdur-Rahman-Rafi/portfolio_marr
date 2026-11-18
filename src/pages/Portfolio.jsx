@@ -59,9 +59,10 @@ const AnimatedCounter = ({ target, suffix = '' }) => {
 
 // ── Skill Category Icons ─────────────────────────────────────
 const categoryIcon = (cat) => {
-    if (cat.toLowerCase().includes('web')) return <Globe size={18} />;
-    if (cat.toLowerCase().includes('security')) return <Shield size={18} />;
-    if (cat.toLowerCase().includes('tools')) return <Terminal size={18} />;
+    const c = cat.toLowerCase();
+    if (c.includes('web') || c.includes('language') || c.includes('framework')) return <Globe size={18} />;
+    if (c.includes('security')) return <Shield size={18} />;
+    if (c.includes('tool') || c.includes('database') || c.includes('backend') || c.includes('data')) return <Terminal size={18} />;
     return <Cpu size={18} />;
 };
 

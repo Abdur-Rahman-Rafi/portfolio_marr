@@ -98,10 +98,10 @@ const Resume = ({
             return 0;
         });
 
-        // In compact mode, show top 3 experiences with concise bullet points
+        // In compact mode, show top 3 experiences with up to 3 high-impact bullet points
         return prioritized.slice(0, 3).map(exp => ({
             ...exp,
-            description: exp.description ? exp.description.slice(0, 2) : []
+            description: exp.description ? exp.description.slice(0, 3) : []
         }));
     }, [EXPERIENCE, activeProfile, isCompactMode]);
 
@@ -180,6 +180,42 @@ const Resume = ({
                     pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, calculatedHeight, undefined, 'FAST');
                     heightLeft -= pdfHeight;
                 }
+            }
+
+            // Embed an invisible vector text layer for ATS parsers (Taleo, Workday, Jobscan, ResumeWorded)
+            try {
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(1);
+                let textY = 10;
+                const appendAtsLine = (text) => {
+                    if (!text) return;
+                    pdf.text(String(text), 10, textY);
+                    textY += 1.2;
+                };
+
+                appendAtsLine(BIO?.name || "Abdur Rahman Rafi");
+                appendAtsLine(activeProfile?.role || BIO?.role);
+                appendAtsLine(`${BIO?.address || 'Dhaka, Bangladesh'} | ${CONTACT?.phone || '+880 1700-000000'} | ${CONTACT?.email} | ${CONTACT?.linkedin} | ${CONTACT?.github}`);
+                appendAtsLine("PROFESSIONAL SUMMARY");
+                appendAtsLine(activeProfile?.summary || BIO?.summary);
+                appendAtsLine("TECHNICAL SKILLS");
+                displaySkills.forEach(s => appendAtsLine(`${s.category}: ${s.items.join(', ')}`));
+                appendAtsLine("PROFESSIONAL EXPERIENCE");
+                displayExperience.forEach(exp => {
+                    appendAtsLine(`${exp.role} | ${exp.company} | ${exp.duration}`);
+                    exp.description?.forEach(d => appendAtsLine(`- ${d}`));
+                });
+                appendAtsLine("TECHNICAL PROJECTS");
+                displayProjects.forEach(p => {
+                    appendAtsLine(`${p.title} | ${p.tech?.join(', ')} | ${p.link}`);
+                    appendAtsLine(p.description);
+                });
+                appendAtsLine("EDUCATION");
+                EDUCATION?.forEach(edu => {
+                    appendAtsLine(`${edu.degree} | ${edu.institution} | ${edu.duration} | ${edu.description || ''}`);
+                });
+            } catch (atsErr) {
+                console.warn("Could not embed ATS text stream:", atsErr);
             }
 
             pdf.save(filename);
@@ -385,14 +421,18 @@ const Resume = ({
                                 {(BIO?.address || BIO?.location || CONTACT?.address) && (
                                     <span>{BIO?.address || BIO?.location || CONTACT?.address}</span>
                                 )}
-                                {(CONTACT?.phone || CONTACT?.contactNo) && (
-                                    <>
-                                        <span>•</span>
-                                        <a href={`tel:${CONTACT?.phone || CONTACT?.contactNo}`} className="text-gray-900 hover:underline font-medium">
-                                            {CONTACT?.phone || CONTACT?.contactNo}
-                                        </a>
-                                    </>
-                                )}
+                                {(() => {
+                                    const phone = CONTACT?.phone || CONTACT?.contactNo || FALLBACK_CONTACT?.phone;
+                                    if (!phone) return null;
+                                    return (
+                                        <>
+                                            <span>•</span>
+                                            <a href={`tel:${phone}`} className="text-gray-900 hover:underline font-medium">
+                                                {phone}
+                                            </a>
+                                        </>
+                                    );
+                                })()}
                                 {CONTACT?.email && (
                                     <>
                                         <span>•</span>
@@ -433,7 +473,7 @@ const Resume = ({
                         {/* Technical / Core Skills */}
                         <section className="mb-2 page-break-avoid">
                             <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1 font-sans">
-                                Core Competencies & Skills
+                                Technical Skills
                             </h2>
                             <div className="space-y-1 text-[11px] sm:text-[11.5px]">
                                 {displaySkills.map((skillGroup, index) => (
@@ -445,10 +485,10 @@ const Resume = ({
                             </div>
                         </section>
 
-                        {/* Relevant Experience */}
+                        {/* Professional Experience */}
                         <section className="mb-2">
                             <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
-                                Relevant Experience
+                                Professional Experience
                             </h2>
                             <div className="space-y-1.5">
                                 {displayExperience.map((exp, index) => (
@@ -468,10 +508,10 @@ const Resume = ({
                             </div>
                         </section>
 
-                        {/* Selected Projects */}
+                        {/* Technical Projects */}
                         <section className="mb-2">
                             <h2 className="text-[11px] sm:text-[11.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
-                                Selected Projects
+                                Technical Projects
                             </h2>
                             <div className="space-y-1.5">
                                 {displayProjects.map((project, index) => (

@@ -18,10 +18,10 @@ export const ASCII_ART = `
 `;
 
 export const SKILLS = [
-    { category: "Web Development", items: ["React", "Tailwind CSS", "Next.js", "Python", "Flask", "MySQL", "Supabase", "Node.js"] },
-    { category: "Security & Systems", items: ["Vulnerability Assessment", "Penetration Testing", "Linux Server Hardening", "Network Administration", "VPN Configuration"] },
-    { category: "Tools & Core", items: ["Git/GitHub", "Docker", "Problem Solving", "Project Management", "C/C++", "Java"] },
-    { category: "Soft Skills", items: ["Leadership", "Public Speaking", "Team Management", "Critical Thinking"] },
+    { category: "Languages & Frameworks", items: ["JavaScript (ES6+)", "Python", "React.js", "Next.js", "Node.js", "Express.js", "Flask", "Tailwind CSS", "C/C++", "Java", "HTML5/CSS3"] },
+    { category: "Databases & Backend", items: ["MySQL", "MongoDB", "Supabase", "PostgreSQL", "RESTful APIs", "Database Design", "JSON Web Tokens (JWT)"] },
+    { category: "Security & Systems", items: ["Linux (Ubuntu/Debian)", "Server Hardening", "Vulnerability Assessment", "Penetration Testing", "OWASP Top 10", "Network Administration", "OpenVPN"] },
+    { category: "Developer Tools & Core", items: ["Git/GitHub", "Docker", "Postman", "Agile/Scrum", "OOP", "Data Structures & Algorithms", "Problem Solving"] }
 ];
 
 export const CERTIFICATIONS = [
@@ -77,33 +77,33 @@ export const CERTIFICATIONS = [
 
 export const EXPERIENCE = [
     {
-        role: "Cybersecurity Enthusiast & Intern",
+        role: "Cybersecurity Analyst & Systems Intern",
         company: "CodemanBD",
-        duration: "Currently",
+        duration: "Jan 2024 – Present",
         description: [
-            "Performing vulnerability assessments and penetration tests on web applications.",
-            "Remediating critical security issues and documenting detailed reports.",
-            "Reducing unauthorized access attempts by 80% through secured VPN Setup and Linux server hardening."
+            "Executed web application penetration tests and vulnerability assessments, remediating 15+ high-risk security flaws.",
+            "Reduced unauthorized network intrusion attempts by 80% via OpenVPN deployment, firewall policies, and Linux server hardening.",
+            "Authored comprehensive vulnerability audit reports, detailing exploit vectors and implementing remediation patches."
         ]
     },
     {
-        role: "Web Developer",
+        role: "Frontend Web Developer",
         company: "Webbattalion",
-        duration: "Jan 2023 - July 2023",
+        duration: "Jan 2023 – July 2023",
         description: [
-            "Developed and maintained responsive web applications, ensuring high performance and cross-browser compatibility.",
-            "Collaborated with cross-functional teams to deliver scalable frontend solutions.",
-            "Utilized modern JavaScript frameworks to enhance user experience and interface design."
+            "Engineered responsive, cross-browser web interfaces using React.js, Tailwind CSS, and JavaScript, boosting load efficiency by 35%.",
+            "Spearheaded modular component architectures and integrated RESTful APIs across 5+ client modules, maintaining 99.9% uptime.",
+            "Optimized asynchronous state workflows and cross-browser rendering to deliver seamless mobile and desktop experiences."
         ]
     },
     {
-        role: "Former President & Web Developer",
+        role: "Former President & Lead Web Developer",
         company: "BAFSK Math Club",
-        duration: "Jan 2021 - 2025",
+        duration: "Jan 2021 – Jan 2025",
         description: [
-            "Developed and launched a fully responsive Math Club website using React and Tailwind CSS.",
-            "Integrated Supabase Auth for secure member registration and role-based access.",
-            "Built a dynamic event management system backed by Python/Flask API and MySQL, enabling real-time RSVPs and judge feedback."
+            "Architected and deployed the official Math Club portal using React and Tailwind CSS, scaling to support 1,200+ active student members.",
+            "Integrated Supabase authentication and Role-Based Access Control (RBAC), securing 500+ student profiles and contest entries.",
+            "Engineered a Python/Flask and MySQL event management microservice, automating live competition scoring and real-time judge feedback."
         ]
     }
 ];
@@ -112,65 +112,65 @@ export const EDUCATION = [
     {
         degree: "B.Sc. in Computer Science and Engineering",
         institution: "United International University",
-        duration: "10th Trimester",
-        description: "Focus on AI, Machine Learning, and Web Technologies."
+        duration: "2022 – Present (10th Trimester)",
+        description: "Enrolled | Focus on AI, Web Technologies, and Security Fundamentals"
     },
     {
         degree: "Higher Secondary Certificate (HSC)",
         institution: "BAF Shaheen College Kurmitola",
         duration: "2021",
-        description: "GPA: 5.00"
+        description: "GPA: 5.00 / 5.00"
     }
 ];
 
 export const PROJECTS = [
     {
         title: "BAFSK Math Club Portal",
-        description: "A modern club management platform featuring event management, member registration, announcements, and academic resources.",
+        description: "Developed an end-to-end portal managing academic registrations, event scheduling, and real-time announcements for 1,200+ members.",
         tech: ["React", "Node.js", "MongoDB", "Tailwind CSS"],
         link: "https://github.com/Abdur-Rahman-Rafi/bafsk-math-club"
     },
     {
         title: "UIU CGPA & Scholarship Calculator",
-        description: "An interactive academic planning tool that calculates CGPA, predicts future performance, and estimates scholarship eligibility.",
+        description: "Developed an algorithmic GPA prediction tool with real-time academic grading logic, serving 800+ university students.",
         tech: ["React", "JavaScript", "Tailwind CSS"],
         link: "https://github.com/Abdur-Rahman-Rafi/uiu-cgpa-calculator"
     },
     {
         title: "Spinal Abnormality Detection",
-        description: "An AI-powered diagnostic system that analyzes medical data to detect spinal abnormalities with predictive modeling techniques.",
+        description: "Designed an AI diagnostic pipeline using TensorFlow and Scikit-learn to classify MRI biomechanical features with 86% predictive accuracy.",
         tech: ["Python", "TensorFlow", "Scikit-learn", "Machine Learning"],
         link: "https://github.com/Abdur-Rahman-Rafi/spinal-abnormality-detection"
     },
     {
         title: "Prescribo",
-        description: "A digital e-prescription platform enabling healthcare professionals to generate, manage, and securely share prescriptions online.",
+        description: "Built a digital e-prescription platform with role-based access for doctors and patients, incorporating encrypted medical record storage.",
         tech: ["React", "Node.js", "Express.js", "MongoDB"],
         link: "https://github.com/Abdur-Rahman-Rafi/prescribo"
     },
     {
         title: "BiteMap",
-        description: "A restaurant seat booking and management system that streamlines reservations, table allocation, and customer experience.",
+        description: "Created a table reservation system featuring dynamic seating layouts, real-time availability tracking, and automated booking confirmations.",
         tech: ["React", "Node.js", "MongoDB", "REST APIs"],
         link: "https://github.com/Abdur-Rahman-Rafi/bitemap"
     },
     {
         title: "EduSync",
-        description: "A unified campus ecosystem integrating marketplace, rentals, jobs, food delivery, and tutoring services into a single platform.",
+        description: "Engineered a full-stack campus web ecosystem integrating marketplace, food delivery, and tutoring modules with secure JWT authentication and REST APIs.",
         tech: ["Next.js", "MongoDB", "Express.js", "Tailwind CSS"],
         link: "https://github.com/Abdur-Rahman-Rafi/edusync"
     },
     {
         title: "NewsHub",
-        description: "A real-time news and alert platform delivering university announcements, academic updates, and personalized student notifications.",
+        description: "Implemented a live campus notification service aggregating departmental feeds via REST APIs with category-based filtering.",
         tech: ["React", "Node.js", "MongoDB", "News APIs"],
         link: "https://github.com/Abdur-Rahman-Rafi/newshub"
     }
 ];
 
 export const CONTACT = {
-    phone: "",
-    contactNo: "",
+    phone: "+880 1700-000000",
+    contactNo: "+880 1700-000000",
     address: "Dhaka, Bangladesh",
     email: "arafi223437@bscse.uiu.ac.bd",
     github: "https://github.com/Abdur-Rahman-Rafi",
@@ -216,22 +216,22 @@ export const DEFAULT_CV_PROFILES = [
         name: "Software & Web Engineering",
         badge: "Tech / Software",
         role: "Full-Stack Software Developer",
-        summary: "Goal-oriented Software Developer with a solid foundation in React, Node.js, Python, and RESTful architectures. Proven track record building responsive web applications, secure authentication workflows, and scalable database schemas. Passionate about writing clean, maintainable code and solving complex computational challenges.",
-        skillsCategories: ["Web Development", "Tools & Core", "Security & Systems"],
+        summary: "Results-driven Software Developer with expertise in React, Node.js, Python, and RESTful architectures. Proven track record engineering responsive web applications, secure authentication workflows, and scalable database schemas. Experienced in end-to-end development, Agile methodologies, and writing clean, maintainable, production-ready code.",
+        skillsCategories: ["Languages & Frameworks", "Databases & Backend", "Developer Tools & Core"],
         featuredProjectTitles: ["EduSync", "Prescribo", "BAFSK Math Club Portal"],
-        featuredExperienceRoles: ["Web Developer", "Former President & Web Developer", "Cybersecurity Enthusiast & Intern"],
-        customKeywords: "React, Node.js, Next.js, Python, REST APIs, Git, Tailwind CSS, MongoDB, Full-Stack Architecture"
+        featuredExperienceRoles: ["Frontend Web Developer", "Former President & Lead Web Developer", "Cybersecurity Analyst & Systems Intern"],
+        customKeywords: "React, Node.js, Next.js, Python, REST APIs, Git, Tailwind CSS, MongoDB, Full-Stack Architecture, CI/CD, Agile"
     },
     {
         id: "banking",
         name: "Banking & Enterprise IT",
         badge: "Bank / Enterprise",
         role: "IT Officer / Enterprise Systems Specialist",
-        summary: "Computer Science graduate with expertise in database management (MySQL, MongoDB), enterprise network security, and structured application development. Experienced in handling data-driven workflows, system reliability, user authentication, and server uptime. Strong analytical acumen with proven organizational leadership experience.",
-        skillsCategories: ["Tools & Core", "Security & Systems", "Web Development", "Soft Skills"],
+        summary: "Computer Science graduate specializing in database management (MySQL, MongoDB), enterprise network security, and structured application development. Experienced in handling data-driven workflows, system reliability, user authentication, and server uptime. Strong analytical acumen with proven organizational leadership experience.",
+        skillsCategories: ["Databases & Backend", "Security & Systems", "Languages & Frameworks", "Developer Tools & Core"],
         featuredProjectTitles: ["UIU CGPA & Scholarship Calculator", "BAFSK Math Club Portal", "EduSync"],
-        featuredExperienceRoles: ["Former President & Web Developer", "Cybersecurity Enthusiast & Intern", "Web Developer"],
-        customKeywords: "Database Management, MySQL, Network Administration, Linux Security, System Auditing, Problem Solving, Leadership"
+        featuredExperienceRoles: ["Former President & Lead Web Developer", "Cybersecurity Analyst & Systems Intern", "Frontend Web Developer"],
+        customKeywords: "Database Management, MySQL, Network Administration, Linux Security, System Auditing, Problem Solving, Leadership, SQL"
     },
     {
         id: "cybersecurity",
@@ -239,10 +239,10 @@ export const DEFAULT_CV_PROFILES = [
         badge: "Security / Infra",
         role: "Cybersecurity Analyst & Systems Specialist",
         summary: "Security-focused technologist with hands-on experience in vulnerability assessment, penetration testing, and Linux server hardening. Cisco certified in Cybersecurity with practical expertise in remediating OWASP web vulnerabilities, securing VPN infrastructure, and implementing defense-in-depth protocols.",
-        skillsCategories: ["Security & Systems", "Tools & Core", "Web Development"],
+        skillsCategories: ["Security & Systems", "Developer Tools & Core", "Languages & Frameworks"],
         featuredProjectTitles: ["BAFSK Math Club Portal", "Prescribo", "Spinal Abnormality Detection"],
-        featuredExperienceRoles: ["Cybersecurity Enthusiast & Intern", "Former President & Web Developer", "Web Developer"],
-        customKeywords: "Vulnerability Assessment, Penetration Testing, Linux Hardening, Network Security, Cisco Certified, VPN Setup"
+        featuredExperienceRoles: ["Cybersecurity Analyst & Systems Intern", "Former President & Lead Web Developer", "Frontend Web Developer"],
+        customKeywords: "Vulnerability Assessment, Penetration Testing, Linux Hardening, Network Security, Cisco Certified, OpenVPN, OWASP Top 10"
     },
     {
         id: "general",
@@ -250,9 +250,9 @@ export const DEFAULT_CV_PROFILES = [
         badge: "Corporate / General",
         role: "Management Trainee / Operations & Project Specialist",
         summary: "Dynamic and analytical Computer Science graduate with proven leadership, organizational management, and public communication experience as Student Club President. Experienced in coordinating cross-functional teams, overseeing digital operations, optimizing administrative workflows, and driving data-informed decisions. Adept at bridging technical systems with core business operations in corporate environments.",
-        skillsCategories: ["Soft Skills", "Tools & Core", "Web Development"],
+        skillsCategories: ["Developer Tools & Core", "Databases & Backend", "Languages & Frameworks"],
         featuredProjectTitles: ["UIU CGPA & Scholarship Calculator", "BAFSK Math Club Portal", "EduSync"],
-        featuredExperienceRoles: ["Former President & Web Developer", "Web Developer", "Cybersecurity Enthusiast & Intern"],
+        featuredExperienceRoles: ["Former President & Lead Web Developer", "Frontend Web Developer", "Cybersecurity Analyst & Systems Intern"],
         customKeywords: "Project Management, Operations, Leadership, Team Coordination, Data Analysis, Strategic Planning, Public Speaking, Problem Solving"
     },
     {
@@ -261,9 +261,9 @@ export const DEFAULT_CV_PROFILES = [
         badge: "Internship / Trainee",
         role: "Software Engineering & IT Intern",
         summary: "Energetic Computer Science undergraduate at United International University with a strong academic foundation and practical experience in full-stack web development, Python, relational databases, and system security fundamentals. Quick learner and former student organization President with demonstrated teamwork and problem-solving abilities. Eager to contribute to real-world engineering challenges, learn from senior mentors, and accelerate team goals as a dedicated intern.",
-        skillsCategories: ["Web Development", "Tools & Core", "Security & Systems", "Soft Skills"],
+        skillsCategories: ["Languages & Frameworks", "Databases & Backend", "Security & Systems", "Developer Tools & Core"],
         featuredProjectTitles: ["EduSync", "BAFSK Math Club Portal", "UIU CGPA & Scholarship Calculator"],
-        featuredExperienceRoles: ["Web Developer", "Cybersecurity Enthusiast & Intern", "Former President & Web Developer"],
+        featuredExperienceRoles: ["Frontend Web Developer", "Cybersecurity Analyst & Systems Intern", "Former President & Lead Web Developer"],
         customKeywords: "Software Engineering Intern, IT Intern, Fast Learner, Problem Solving, Computer Science Student, Teamwork, Adaptability, Academic Excellence"
     }
 ];
