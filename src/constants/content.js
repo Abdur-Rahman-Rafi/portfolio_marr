@@ -254,6 +254,17 @@ export const DEFAULT_CV_PROFILES = [
         featuredProjectTitles: ["UIU CGPA & Scholarship Calculator", "BAFSK Math Club Portal", "EduSync"],
         featuredExperienceRoles: ["Former President & Web Developer", "Web Developer", "Cybersecurity Enthusiast & Intern"],
         customKeywords: "Project Management, Operations, Leadership, Team Coordination, Data Analysis, Strategic Planning, Public Speaking, Problem Solving"
+    },
+    {
+        id: "internship",
+        name: "IT & Technology Internship",
+        badge: "Internship / Trainee",
+        role: "Software Engineering & IT Intern",
+        summary: "Energetic Computer Science undergraduate at United International University with a strong academic foundation and practical experience in full-stack web development, Python, relational databases, and system security fundamentals. Quick learner and former student organization President with demonstrated teamwork and problem-solving abilities. Eager to contribute to real-world engineering challenges, learn from senior mentors, and accelerate team goals as a dedicated intern.",
+        skillsCategories: ["Web Development", "Tools & Core", "Security & Systems", "Soft Skills"],
+        featuredProjectTitles: ["EduSync", "BAFSK Math Club Portal", "UIU CGPA & Scholarship Calculator"],
+        featuredExperienceRoles: ["Web Developer", "Cybersecurity Enthusiast & Intern", "Former President & Web Developer"],
+        customKeywords: "Software Engineering Intern, IT Intern, Fast Learner, Problem Solving, Computer Science Student, Teamwork, Adaptability, Academic Excellence"
     }
 ];
 

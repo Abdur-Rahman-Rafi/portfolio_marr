@@ -337,6 +337,7 @@ The candidate applying is Abdur Rahman Rafi, CS student with expertise across:
 - Web Development (React, Next.js, Node.js, Python, Flask, Supabase, MySQL, Tailwind CSS)
 - Systems & Cybersecurity (Vulnerability Assessment, Penetration Testing, Linux Hardening, Network Administration, Cisco Certified)
 - General & Management / Non-Technical (President of Student Organization, project management, team leadership, public speaking, event organization, operations)
+- Internships & Trainee Positions (high learnability, strong academic record at UIU, self-built engineering projects, eager to ramp up quickly under senior engineers)
 - Projects: EduSync, Prescribo, BAFSK Math Club Portal, UIU CGPA & Scholarship Calculator, Spinal Abnormality Detection (AI), BiteMap
 - Experience: CodemanBD (Cybersecurity Intern), Webbattalion (Web Developer), BAFSK Math Club (President & Developer).
 
@@ -344,8 +345,8 @@ Task:
 Extract essential requirements from this circular to create an ultra-tailored, ATS-optimized 1-page CV profile.
 Return ONLY valid JSON (no markdown fences, no explanatory text):
 {
-  "targetRole": "Exact job title tailored to this circular (e.g. 'Software Engineer', 'IT Officer', 'Cybersecurity Specialist', 'Management Trainee')",
-  "trackBadge": "Brief sector badge (e.g. 'Tech / Software', 'Bank / Enterprise', 'Cybersecurity', 'Corporate / General')",
+  "targetRole": "Exact job title tailored to this circular (e.g. 'Software Engineer', 'IT Officer', 'Cybersecurity Specialist', 'Management Trainee', 'Software Engineering Intern')",
+  "trackBadge": "Brief sector badge (e.g. 'Tech / Software', 'Bank / Enterprise', 'Cybersecurity', 'Corporate / General', 'Internship / Trainee')",
   "atsSummary": "A tailored, high-impact 2-3 sentence ATS professional summary emphasizing candidate qualifications matching this circular's requirements.",
   "recommendedSkillsCategories": ["Web Development", "Tools & Core", "Security & Systems"],
   "recommendedProjectTitles": ["EduSync", "Prescribo"],
@@ -440,8 +441,8 @@ Return ONLY valid JSON (no markdown fences, no explanatory text):
     };
 
     const handleDeleteTrack = (trackId) => {
-        if (['software', 'banking', 'cybersecurity', 'general'].includes(trackId)) {
-            alert('The core default tracks (Software, Banking, Cybersecurity, General) cannot be deleted, but you can edit all their fields!');
+        if (['software', 'banking', 'cybersecurity', 'general', 'internship'].includes(trackId)) {
+            alert('The core default tracks (Software, Banking, Cybersecurity, General, Internship) cannot be deleted, but you can edit all their fields!');
             return;
         }
         if (window.confirm('Delete this custom CV track?')) {
@@ -608,7 +609,7 @@ Return ONLY valid JSON (no markdown fences, no explanatory text):
                                             {track.badge || track.id}
                                         </span>
                                     </button>
-                                    {!['software', 'banking', 'cybersecurity', 'general'].includes(track.id) && (
+                                    {!['software', 'banking', 'cybersecurity', 'general', 'internship'].includes(track.id) && (
                                         <button
                                             type="button"
                                             onClick={() => handleDeleteTrack(track.id)}
