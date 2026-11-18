@@ -128,43 +128,43 @@ export const PROJECTS = [
         title: "BAFSK Math Club Portal",
         description: "A modern club management platform featuring event management, member registration, announcements, and academic resources.",
         tech: ["React", "Node.js", "MongoDB", "Tailwind CSS"],
-        link: "#"
+        link: "https://github.com/Abdur-Rahman-Rafi/bafsk-math-club"
     },
     {
         title: "UIU CGPA & Scholarship Calculator",
         description: "An interactive academic planning tool that calculates CGPA, predicts future performance, and estimates scholarship eligibility.",
         tech: ["React", "JavaScript", "Tailwind CSS"],
-        link: "#"
+        link: "https://github.com/Abdur-Rahman-Rafi/uiu-cgpa-calculator"
     },
     {
         title: "Spinal Abnormality Detection",
         description: "An AI-powered diagnostic system that analyzes medical data to detect spinal abnormalities with predictive modeling techniques.",
         tech: ["Python", "TensorFlow", "Scikit-learn", "Machine Learning"],
-        link: "#"
+        link: "https://github.com/Abdur-Rahman-Rafi/spinal-abnormality-detection"
     },
     {
         title: "Prescribo",
         description: "A digital e-prescription platform enabling healthcare professionals to generate, manage, and securely share prescriptions online.",
         tech: ["React", "Node.js", "Express.js", "MongoDB"],
-        link: "#"
+        link: "https://github.com/Abdur-Rahman-Rafi/prescribo"
     },
     {
         title: "BiteMap",
         description: "A restaurant seat booking and management system that streamlines reservations, table allocation, and customer experience.",
         tech: ["React", "Node.js", "MongoDB", "REST APIs"],
-        link: "#"
+        link: "https://github.com/Abdur-Rahman-Rafi/bitemap"
     },
     {
         title: "EduSync",
         description: "A unified campus ecosystem integrating marketplace, rentals, jobs, food delivery, and tutoring services into a single platform.",
         tech: ["Next.js", "MongoDB", "Express.js", "Tailwind CSS"],
-        link: "#"
+        link: "https://github.com/Abdur-Rahman-Rafi/edusync"
     },
     {
         title: "NewsHub",
         description: "A real-time news and alert platform delivering university announcements, academic updates, and personalized student notifications.",
         tech: ["React", "Node.js", "MongoDB", "News APIs"],
-        link: "#"
+        link: "https://github.com/Abdur-Rahman-Rafi/newshub"
     }
 ];
 
@@ -243,6 +243,17 @@ export const DEFAULT_CV_PROFILES = [
         featuredProjectTitles: ["BAFSK Math Club Portal", "Prescribo", "Spinal Abnormality Detection"],
         featuredExperienceRoles: ["Cybersecurity Enthusiast & Intern", "Former President & Web Developer", "Web Developer"],
         customKeywords: "Vulnerability Assessment, Penetration Testing, Linux Hardening, Network Security, Cisco Certified, VPN Setup"
+    },
+    {
+        id: "general",
+        name: "General & Corporate Management",
+        badge: "Corporate / General",
+        role: "Management Trainee / Operations & Project Specialist",
+        summary: "Dynamic and analytical Computer Science graduate with proven leadership, organizational management, and public communication experience as Student Club President. Experienced in coordinating cross-functional teams, overseeing digital operations, optimizing administrative workflows, and driving data-informed decisions. Adept at bridging technical systems with core business operations in corporate environments.",
+        skillsCategories: ["Soft Skills", "Tools & Core", "Web Development"],
+        featuredProjectTitles: ["UIU CGPA & Scholarship Calculator", "BAFSK Math Club Portal", "EduSync"],
+        featuredExperienceRoles: ["Former President & Web Developer", "Web Developer", "Cybersecurity Enthusiast & Intern"],
+        customKeywords: "Project Management, Operations, Leadership, Team Coordination, Data Analysis, Strategic Planning, Public Speaking, Problem Solving"
     }
 ];
 

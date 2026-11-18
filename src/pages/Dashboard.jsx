@@ -336,6 +336,7 @@ ${circularText}
 The candidate applying is Abdur Rahman Rafi, CS student with expertise across:
 - Web Development (React, Next.js, Node.js, Python, Flask, Supabase, MySQL, Tailwind CSS)
 - Systems & Cybersecurity (Vulnerability Assessment, Penetration Testing, Linux Hardening, Network Administration, Cisco Certified)
+- General & Management / Non-Technical (President of Student Organization, project management, team leadership, public speaking, event organization, operations)
 - Projects: EduSync, Prescribo, BAFSK Math Club Portal, UIU CGPA & Scholarship Calculator, Spinal Abnormality Detection (AI), BiteMap
 - Experience: CodemanBD (Cybersecurity Intern), Webbattalion (Web Developer), BAFSK Math Club (President & Developer).
 
@@ -343,8 +344,8 @@ Task:
 Extract essential requirements from this circular to create an ultra-tailored, ATS-optimized 1-page CV profile.
 Return ONLY valid JSON (no markdown fences, no explanatory text):
 {
-  "targetRole": "Exact job title tailored to this circular (e.g. 'Software Engineer', 'IT Officer', 'Cybersecurity Specialist')",
-  "trackBadge": "Brief sector badge (e.g. 'Tech / Software', 'Bank / Enterprise', 'Cybersecurity', 'Corporate IT')",
+  "targetRole": "Exact job title tailored to this circular (e.g. 'Software Engineer', 'IT Officer', 'Cybersecurity Specialist', 'Management Trainee')",
+  "trackBadge": "Brief sector badge (e.g. 'Tech / Software', 'Bank / Enterprise', 'Cybersecurity', 'Corporate / General')",
   "atsSummary": "A tailored, high-impact 2-3 sentence ATS professional summary emphasizing candidate qualifications matching this circular's requirements.",
   "recommendedSkillsCategories": ["Web Development", "Tools & Core", "Security & Systems"],
   "recommendedProjectTitles": ["EduSync", "Prescribo"],
@@ -439,8 +440,8 @@ Return ONLY valid JSON (no markdown fences, no explanatory text):
     };
 
     const handleDeleteTrack = (trackId) => {
-        if (['software', 'banking', 'cybersecurity'].includes(trackId)) {
-            alert('The core default tracks (Software, Banking, Cybersecurity) cannot be deleted, but you can edit all their fields!');
+        if (['software', 'banking', 'cybersecurity', 'general'].includes(trackId)) {
+            alert('The core default tracks (Software, Banking, Cybersecurity, General) cannot be deleted, but you can edit all their fields!');
             return;
         }
         if (window.confirm('Delete this custom CV track?')) {
@@ -607,7 +608,7 @@ Return ONLY valid JSON (no markdown fences, no explanatory text):
                                             {track.badge || track.id}
                                         </span>
                                     </button>
-                                    {!['software', 'banking', 'cybersecurity'].includes(track.id) && (
+                                    {!['software', 'banking', 'cybersecurity', 'general'].includes(track.id) && (
                                         <button
                                             type="button"
                                             onClick={() => handleDeleteTrack(track.id)}
@@ -956,7 +957,12 @@ Return ONLY valid JSON (no markdown fences, no explanatory text):
                                 </div>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <Input label="Title" value={proj.title} onChange={e => updateProject(idx, 'title', e.target.value)} />
-                                    <Input label="Link" value={proj.link} onChange={e => updateProject(idx, 'link', e.target.value)} />
+                                    <div>
+                                        <Input label="Project Link / Repo URL" value={proj.link} onChange={e => updateProject(idx, 'link', e.target.value)} placeholder="https://github.com/... or https://..." />
+                                        <span className="block -mt-3 mb-2 text-[11px] text-slate-500">
+                                            Clean URL will be printed on your CV so recruiters can access it on paper and screen.
+                                        </span>
+                                    </div>
                                 </div>
                                 <Textarea label="Description" value={proj.description} onChange={e => updateProject(idx, 'description', e.target.value)} rows={2} />
                                 <Input label="Tech Stack (comma separated)" value={Array.isArray(proj.tech) ? proj.tech.join(', ') : proj.tech} onChange={e => updateProject(idx, 'tech', e.target.value)} />

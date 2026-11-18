@@ -53,6 +53,12 @@ const Resume = ({
         return `https://${trimmedUrl}`;
     };
 
+    // Format full clean URL for print and display (removes https://, www, trailing slashes)
+    const formatDisplayUrl = (url) => {
+        if (!url || url === '#' || url === '/') return '';
+        return url.trim().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+    };
+
     // Filter projects based on track & compact mode
     const displayProjects = React.useMemo(() => {
         if (!PROJECTS || PROJECTS.length === 0) return [];
@@ -62,8 +68,8 @@ const Resume = ({
         const prioritized = PROJECTS.filter(p => targetTitles.includes(p.title));
         const remaining = PROJECTS.filter(p => !targetTitles.includes(p.title));
         
-        // In 1-page compact mode, take at most 2 to 3 projects to guarantee strict 1-page fit
-        return [...prioritized, ...remaining].slice(0, 2);
+        // In 1-page compact mode, take up to 3 featured projects to fill page substance beautifully
+        return [...prioritized, ...remaining].slice(0, 3);
     }, [PROJECTS, activeProfile, isCompactMode]);
 
     // Filter skills based on track
@@ -283,22 +289,22 @@ const Resume = ({
                         style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}
                     >
                         {/* Header */}
-                        <header className="border-b-2 border-gray-900 pb-3 mb-4 text-center">
-                            <h1 className="text-xl sm:text-2xl font-bold tracking-tight uppercase text-gray-950 mb-1">
+                        <header className="border-b-2 border-gray-900 pb-3.5 mb-4 text-center">
+                            <h1 className="text-2xl sm:text-[27px] font-extrabold tracking-tight uppercase text-gray-950 mb-1">
                                 {BIO?.name || "Abdur Rahman Rafi"}
                             </h1>
-                            <p className="text-xs sm:text-sm font-semibold tracking-wide text-blue-900 uppercase mb-2">
+                            <p className="text-xs sm:text-[13.5px] font-bold tracking-wider text-blue-900 uppercase mb-2.5">
                                 {activeProfile?.role || BIO?.role}
                             </p>
                             
-                            <div className="flex flex-wrap justify-center text-[11px] sm:text-[11.5px] text-gray-600 gap-x-2 gap-y-1 font-sans">
+                            <div className="flex flex-wrap justify-center text-[11.5px] sm:text-[12px] text-gray-700 gap-x-2.5 gap-y-1 font-sans">
                                 {(BIO?.address || BIO?.location || CONTACT?.address) && (
                                     <span>{BIO?.address || BIO?.location || CONTACT?.address}</span>
                                 )}
                                 {(CONTACT?.phone || CONTACT?.contactNo) && (
                                     <>
                                         <span>•</span>
-                                        <a href={`tel:${CONTACT?.phone || CONTACT?.contactNo}`} className="text-gray-800 hover:underline">
+                                        <a href={`tel:${CONTACT?.phone || CONTACT?.contactNo}`} className="text-gray-900 hover:underline font-medium">
                                             {CONTACT?.phone || CONTACT?.contactNo}
                                         </a>
                                     </>
@@ -306,7 +312,7 @@ const Resume = ({
                                 {CONTACT?.email && (
                                     <>
                                         <span>•</span>
-                                        <a href={`mailto:${CONTACT?.email}`} className="text-blue-800 hover:underline">
+                                        <a href={`mailto:${CONTACT?.email}`} className="text-blue-900 hover:underline font-medium">
                                             {CONTACT?.email}
                                         </a>
                                     </>
@@ -314,16 +320,16 @@ const Resume = ({
                                 {CONTACT?.linkedin && (
                                     <>
                                         <span>•</span>
-                                        <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
-                                            LinkedIn
+                                        <a href={getValidUrl(CONTACT?.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">
+                                            {formatDisplayUrl(CONTACT?.linkedin) || 'LinkedIn'}
                                         </a>
                                     </>
                                 )}
                                 {CONTACT?.github && (
                                     <>
                                         <span>•</span>
-                                        <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
-                                            GitHub
+                                        <a href={getValidUrl(CONTACT?.github)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">
+                                            {formatDisplayUrl(CONTACT?.github) || 'GitHub'}
                                         </a>
                                     </>
                                 )}
@@ -331,102 +337,102 @@ const Resume = ({
                         </header>
 
                         {/* Professional Summary */}
-                        <section className="mb-3.5 page-break-avoid">
-                            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-0.5 mb-1.5 font-sans">
+                        <section className="mb-4 page-break-avoid">
+                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
                                 Professional Summary
                             </h2>
-                            <p className="text-gray-800 text-justify text-[11.5px] sm:text-[12px] leading-relaxed">
+                            <p className="text-gray-800 text-justify text-[12px] sm:text-[12.5px] leading-relaxed">
                                 {activeProfile?.summary || BIO?.summary}
                             </p>
                         </section>
 
-                        {/* Technical Skills */}
-                        <section className="mb-3.5 page-break-avoid">
-                            <h2 className="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-0.5 mb-1.5 font-sans">
+                        {/* Technical / Core Skills */}
+                        <section className="mb-4 page-break-avoid">
+                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
                                 Core Competencies & Skills
                             </h2>
-                            <div className="space-y-1 text-[11.5px] sm:text-[12px]">
+                            <div className="space-y-1.5 text-[12px] sm:text-[12.5px]">
                                 {displaySkills.map((skillGroup, index) => (
-                                    <div key={index} className="grid grid-cols-1 sm:grid-cols-[130px_1fr] items-baseline">
-                                        <span className="font-bold text-gray-900 font-sans text-[11px] sm:text-[11.5px]">{skillGroup.category}:</span>
-                                        <span className="text-gray-800">{skillGroup.items.join(', ')}</span>
+                                    <div key={index} className="grid grid-cols-1 sm:grid-cols-[140px_1fr] items-baseline">
+                                        <span className="font-bold text-gray-950 font-sans text-[11.5px] sm:text-[12px]">{skillGroup.category}:</span>
+                                        <span className="text-gray-800 leading-snug">{skillGroup.items.join(', ')}</span>
                                     </div>
                                 ))}
                             </div>
                         </section>
 
-                    {/* Experience */}
-                    <section className="mb-3.5">
-                        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-0.5 mb-2 font-sans">
-                            Relevant Experience
-                        </h2>
-                        <div className="space-y-2.5">
-                            {displayExperience.map((exp, index) => (
-                                <div key={index} className="page-break-avoid">
-                                    <div className="flex justify-between items-baseline">
-                                        <h3 className="font-bold text-gray-950 text-[12.5px]">{exp.role}</h3>
-                                        <span className="text-[11px] font-medium text-gray-600 font-sans">{exp.duration}</span>
+                        {/* Relevant Experience */}
+                        <section className="mb-4">
+                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-2 font-sans">
+                                Relevant Experience
+                            </h2>
+                            <div className="space-y-3">
+                                {displayExperience.map((exp, index) => (
+                                    <div key={index} className="page-break-avoid">
+                                        <div className="flex justify-between items-baseline flex-wrap gap-x-2">
+                                            <h3 className="font-bold text-gray-950 text-[12.5px] sm:text-[13px]">{exp.role}</h3>
+                                            <span className="text-[11.5px] font-medium text-gray-600 font-sans">{exp.duration}</span>
+                                        </div>
+                                        <div className="text-[11.5px] sm:text-[12px] font-semibold text-blue-900 italic mb-1">{exp.company}</div>
+                                        <ul className="list-disc list-outside ml-4 text-[11.5px] sm:text-[12px] text-gray-800 space-y-0.5 leading-snug">
+                                            {exp.description?.map((desc, i) => (
+                                                <li key={i} className="pl-0.5">{desc}</li>
+                                            ))}
+                                        </ul>
                                     </div>
-                                    <div className="text-[11.5px] font-semibold text-blue-900 italic mb-1">{exp.company}</div>
-                                    <ul className="list-disc list-outside ml-4 text-[11.5px] text-gray-800 space-y-0.5 leading-snug">
-                                        {exp.description?.map((desc, i) => (
-                                            <li key={i} className="pl-0.5">{desc}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                                ))}
+                            </div>
+                        </section>
 
-                    {/* Featured Projects */}
-                    <section className="mb-3.5">
-                        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-0.5 mb-2 font-sans">
-                            Selected Projects
-                        </h2>
-                        <div className="space-y-2.5">
-                            {displayProjects.map((project, index) => (
-                                <div key={index} className="page-break-avoid">
-                                    <div className="flex justify-between items-baseline">
-                                        <h3 className="font-bold text-gray-950 text-[12px] flex items-center gap-1.5">
-                                            {project.title}
-                                            {project.link && project.link !== '#' && (
-                                                <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer" className="text-[10px] text-blue-800 hover:underline font-normal font-sans">
-                                                    [Live Demo]
-                                                </a>
-                                            )}
-                                        </h3>
-                                        <span className="text-[10.5px] text-gray-600 font-sans font-medium">
-                                            {project.tech?.slice(0, 4).join(' • ')}
+                        {/* Selected Projects */}
+                        <section className="mb-4">
+                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-2 font-sans">
+                                Selected Projects
+                            </h2>
+                            <div className="space-y-3">
+                                {displayProjects.map((project, index) => (
+                                    <div key={index} className="page-break-avoid">
+                                        <div className="flex justify-between items-baseline flex-wrap gap-x-2">
+                                            <div className="flex items-baseline gap-1.5 flex-wrap">
+                                                <h3 className="font-bold text-gray-950 text-[12.5px] sm:text-[13px]">{project.title}</h3>
+                                                {project.link && project.link !== '#' && (
+                                                    <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer" className="text-[11px] text-blue-800 hover:underline font-mono">
+                                                        ({formatDisplayUrl(project.link)})
+                                                    </a>
+                                                )}
+                                            </div>
+                                            <span className="text-[11px] text-gray-600 font-sans font-medium">
+                                                {project.tech?.slice(0, 4).join(' • ')}
+                                            </span>
+                                        </div>
+                                        <p className="text-[11.5px] sm:text-[12px] text-gray-800 leading-snug mt-0.5">
+                                            {project.description}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* Education */}
+                        <section className="page-break-avoid">
+                            <h2 className="text-xs sm:text-[12.5px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5 font-sans">
+                                Education
+                            </h2>
+                            <div className="space-y-1.5">
+                                {EDUCATION?.map((edu, index) => (
+                                    <div key={index} className="flex justify-between items-start text-[12px] sm:text-[12.5px]">
+                                        <div>
+                                            <span className="font-bold text-gray-950">{edu.degree}</span>
+                                            <span className="text-gray-700"> — {edu.institution}</span>
+                                            {edu.description && <span className="text-gray-600 italic"> ({edu.description})</span>}
+                                        </div>
+                                        <span className="text-[11px] sm:text-[11.5px] font-medium text-gray-600 font-sans whitespace-nowrap ml-2">
+                                            {edu.duration}
                                         </span>
                                     </div>
-                                    <p className="text-[11.5px] text-gray-800 leading-snug mt-0.5">
-                                        {project.description}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* Education */}
-                    <section className="page-break-avoid">
-                        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-0.5 mb-1.5 font-sans">
-                            Education
-                        </h2>
-                        <div className="space-y-1.5">
-                            {EDUCATION?.map((edu, index) => (
-                                <div key={index} className="flex justify-between items-start text-[11.5px]">
-                                    <div>
-                                        <span className="font-bold text-gray-950">{edu.degree}</span>
-                                        <span className="text-gray-700"> — {edu.institution}</span>
-                                        {edu.description && <span className="text-gray-600 italic"> ({edu.description})</span>}
-                                    </div>
-                                    <span className="text-[11px] font-medium text-gray-600 font-sans whitespace-nowrap ml-2">
-                                        {edu.duration}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                                ))}
+                            </div>
+                        </section>
                 </div>
             </div>
 
