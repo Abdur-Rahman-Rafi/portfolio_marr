@@ -46,6 +46,7 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
         `<tr><td class="skill-label">${sg.category}:</td><td class="skill-val">${sg.items.join(', ')}</td></tr>`
     ).join('');
 
+    // 1-2 high impact points per role for strict 1-page fit
     const expBlocks = displayExperience.map(exp => `
         <div class="exp-block">
             <div class="exp-header">
@@ -54,11 +55,12 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
             </div>
             <div class="exp-company">${exp.company}</div>
             <ul class="bullets">
-                ${(exp.description || []).map(d => `<li>${d}</li>`).join('')}
+                ${(exp.description || []).slice(0, 2).map(d => `<li>${d}</li>`).join('')}
             </ul>
         </div>
     `).join('');
 
+    // 1 concise line per project
     const projBlocks = displayProjects.map(p => {
         const linkUrl = p.link && p.link !== '#' ? toUrl(p.link) : '';
         const linkDisplay = linkUrl ? fmtUrl(linkUrl) : '';
@@ -114,36 +116,36 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
   header {
     text-align: center;
     border-bottom: 2px solid #0f172a;
-    padding-bottom: 7pt;
-    margin-bottom: 11pt;
+    padding-bottom: 5pt;
+    margin-bottom: 6pt;
   }
   h1.cv-name {
-    font-size: 24pt;
+    font-size: 21pt;
     font-weight: 900;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #020617;
     line-height: 1.15;
-    margin-bottom: 3pt;
+    margin-bottom: 2pt;
   }
   p.cv-role {
-    font-size: 11pt;
+    font-size: 10pt;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     color: #1d4ed8;
-    margin-bottom: 6pt;
+    margin-bottom: 4pt;
     font-family: Arial, Helvetica, sans-serif;
   }
   .contact-line {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.6pt;
+    font-size: 8.8pt;
     color: #374151;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 3pt 8pt;
-    line-height: 1.45;
+    gap: 2pt 7pt;
+    line-height: 1.35;
   }
   .contact-line a {
     color: #1d4ed8;
@@ -157,7 +159,7 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
 
   /* ── Sections ── */
   section {
-    margin-bottom: 11pt;
+    margin-bottom: 6.5pt;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -166,21 +168,21 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
   }
   h2.sec-head {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 11pt;
+    font-size: 9.8pt;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.06em;
     color: #0f172a;
     border-bottom: 1.5px solid #1e293b;
-    padding-bottom: 2.5pt;
-    margin-bottom: 6.5pt;
+    padding-bottom: 1.5pt;
+    margin-bottom: 3.5pt;
   }
 
   /* ── Professional Summary ── */
   p.summary {
-    font-size: 10.2pt;
+    font-size: 9.3pt;
     color: #1f2937;
-    line-height: 1.52;
+    line-height: 1.4;
     text-align: justify;
   }
 
@@ -192,25 +194,25 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
   td.skill-label {
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 700;
-    font-size: 10.2pt;
+    font-size: 9.3pt;
     color: #0f172a;
     white-space: nowrap;
     padding-right: 8pt;
-    padding-bottom: 3.5pt;
+    padding-bottom: 1.5pt;
     vertical-align: top;
-    width: 140pt;
+    width: 125pt;
   }
   td.skill-val {
-    font-size: 10.2pt;
+    font-size: 9.3pt;
     color: #1f2937;
-    line-height: 1.48;
-    padding-bottom: 3.5pt;
+    line-height: 1.38;
+    padding-bottom: 1.5pt;
     vertical-align: top;
   }
 
   /* ── Professional Experience ── */
   .exp-block {
-    margin-bottom: 8pt;
+    margin-bottom: 4pt;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -225,37 +227,37 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
   }
   .exp-role {
     font-weight: 700;
-    font-size: 11pt;
+    font-size: 9.8pt;
     color: #0f172a;
   }
   .exp-dur {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.6pt;
+    font-size: 8.8pt;
     font-weight: 600;
     color: #4b5563;
     white-space: nowrap;
   }
   .exp-company {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.8pt;
+    font-size: 9pt;
     font-weight: 600;
     color: #1d4ed8;
     font-style: italic;
-    margin-bottom: 2.5pt;
+    margin-bottom: 1pt;
   }
   ul.bullets {
-    margin-left: 14pt;
+    margin-left: 13pt;
   }
   ul.bullets li {
-    font-size: 10pt;
+    font-size: 9pt;
     color: #1f2937;
-    line-height: 1.46;
-    margin-bottom: 2pt;
+    line-height: 1.36;
+    margin-bottom: 1pt;
   }
 
   /* ── Technical Projects ── */
   .proj-block {
-    margin-bottom: 7.5pt;
+    margin-bottom: 3.5pt;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -267,36 +269,36 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
     justify-content: space-between;
     align-items: baseline;
     flex-wrap: wrap;
-    margin-bottom: 1.5pt;
+    margin-bottom: 1pt;
   }
   .proj-left {
     display: flex;
     align-items: baseline;
-    gap: 6pt;
+    gap: 5pt;
     flex-wrap: wrap;
   }
   .proj-title {
     font-weight: 700;
-    font-size: 11pt;
+    font-size: 9.8pt;
     color: #0f172a;
   }
   .proj-link {
     font-family: "Courier New", Courier, monospace;
-    font-size: 8.8pt;
+    font-size: 8.2pt;
     color: #1d4ed8;
     text-decoration: none;
   }
   .proj-tech {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.5pt;
+    font-size: 8.8pt;
     font-weight: 600;
     color: #4b5563;
     white-space: nowrap;
   }
   .proj-desc {
-    font-size: 10pt;
+    font-size: 9pt;
     color: #1f2937;
-    line-height: 1.45;
+    line-height: 1.35;
   }
 
   /* ── Education ── */
@@ -304,10 +306,10 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 4pt;
+    margin-bottom: 2pt;
     break-inside: avoid;
     page-break-inside: avoid;
-    font-size: 10.2pt;
+    font-size: 9.3pt;
   }
   .edu-row:last-child {
     margin-bottom: 0;
@@ -322,11 +324,11 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
   .edu-note {
     color: #6b7280;
     font-style: italic;
-    font-size: 9.5pt;
+    font-size: 8.8pt;
   }
   .edu-dur {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.6pt;
+    font-size: 8.8pt;
     font-weight: 600;
     color: #4b5563;
     white-space: nowrap;
@@ -397,14 +399,14 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
       background: #ffffff;
       width: 210mm;
       min-height: 297mm;
-      padding: 12mm 15mm 10mm 15mm;
+      padding: 10mm 13mm 8mm 13mm;
       box-sizing: border-box;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
       border-radius: 2px;
     }
   }
 
-  /* ── Clean Print Setup: No Headers, No Footers, Exact A4 ── */
+  /* ── Clean Print Setup: Exact 1 Page A4 with Education Completely Visible ── */
   @media print {
     body {
       background: #ffffff !important;
@@ -426,7 +428,7 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
       width: 210mm !important;
       height: 297mm !important;
       max-height: 297mm !important;
-      padding: 12mm 15mm 10mm 15mm !important;
+      padding: 10mm 13mm 8mm 13mm !important;
       box-sizing: border-box !important;
       overflow: hidden !important;
       page-break-after: avoid !important;
@@ -441,7 +443,7 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
 
 <div class="print-bar">
   <div class="tip">
-    🖨️ <strong>Save as PDF:</strong> Select <strong>Destination: Save as PDF</strong>. Margins are zeroed so timing, date, and URL headers are hidden automatically.
+    🖨️ <strong>Save as PDF:</strong> Select <strong>Destination: Save as PDF</strong>. All sections (including Education) fit strictly on 1 page with zero headers/footers.
   </div>
   <div class="print-bar-actions">
     <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
@@ -553,9 +555,10 @@ const Resume = ({
             if (bi !== -1) return 1;
             return 0;
         });
+        // Strict 1-page mode: 1-2 powerful bullet points per role
         return sorted.slice(0, 3).map(exp => ({
             ...exp,
-            description: exp.description ? exp.description.slice(0, 3) : []
+            description: exp.description ? exp.description.slice(0, 2) : []
         }));
     }, [EXPERIENCE, activeProfile, isCompactMode]);
 
@@ -627,7 +630,7 @@ const Resume = ({
                         max-width: 210mm !important; 
                         height: 297mm !important;
                         max-height: 297mm !important;
-                        padding: 12mm 15mm 10mm 15mm !important;
+                        padding: 10mm 13mm 8mm 13mm !important;
                         box-sizing: border-box !important;
                         overflow: hidden !important;
                         page-break-after: avoid !important;
@@ -717,7 +720,7 @@ const Resume = ({
 
                     {/* Helpful Tip */}
                     <p className="text-[10px] text-slate-400 text-center leading-snug">
-                        ✨ <strong className="text-slate-300">Clean 1-Page A4:</strong> Calibrated with professional 10.5pt typography to fill the whole page with zero browser timing or URL headers.
+                        ✨ <strong className="text-slate-300">Clean 1-Page A4:</strong> Calibrated with concise 1–2 bullet points to keep Education & all sections 100% visible on 1 page.
                     </p>
                 </div>
 
@@ -728,20 +731,20 @@ const Resume = ({
                         onClick={e => e.stopPropagation()}
                         className={`resume-paper w-full max-w-[210mm] bg-white text-gray-900 shadow-2xl rounded-none pointer-events-auto transition-all ${
                             isCompactMode
-                                ? 'p-5 sm:p-[12mm_15mm] text-[11px] leading-normal'
-                                : 'p-6 sm:p-[14mm_16mm] text-[12.5px] leading-normal'
+                                ? 'p-4 sm:p-[10mm_13mm] text-[10.5px] leading-normal'
+                                : 'p-6 sm:p-[14mm_16mm] text-[12px] leading-normal'
                         }`}
                         style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', boxSizing: 'border-box' }}
                     >
                         {/* Header */}
-                        <header className="border-b-2 border-gray-900 pb-2.5 mb-3 text-center">
-                            <h1 className="text-[25px] sm:text-[27px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5 leading-tight">
+                        <header className="border-b-2 border-gray-900 pb-2 mb-2 text-center">
+                            <h1 className="text-[22px] sm:text-[24px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5 leading-tight">
                                 {BIO?.name || 'Abdur Rahman Rafi'}
                             </h1>
-                            <p className="text-[11.5px] sm:text-[12.5px] font-bold tracking-wider text-blue-900 uppercase mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                            <p className="text-[11px] sm:text-[11.5px] font-bold tracking-wider text-blue-900 uppercase mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                 {activeProfile?.role || BIO?.role}
                             </p>
-                            <div className="flex flex-wrap justify-center text-[10.5px] sm:text-[11px] text-gray-700 gap-x-2.5 gap-y-0.5 leading-tight" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                            <div className="flex flex-wrap justify-center text-[10px] sm:text-[10.5px] text-gray-700 gap-x-2 gap-y-0.5 leading-tight" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                 {(BIO?.address || BIO?.location || CONTACT?.address) && (
                                     <span>{BIO?.address || BIO?.location || CONTACT?.address}</span>
                                 )}
@@ -757,45 +760,45 @@ const Resume = ({
                         </header>
 
                         {/* Professional Summary */}
-                        <section className="mb-3 page-break-avoid">
-                            <h2 className="text-[11.5px] sm:text-[12px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <section className="mb-2 page-break-avoid">
+                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                 Professional Summary
                             </h2>
-                            <p className="text-gray-800 text-justify text-[11px] sm:text-[11.5px] leading-relaxed">
+                            <p className="text-gray-800 text-justify text-[10.5px] sm:text-[11px] leading-snug">
                                 {activeProfile?.summary || BIO?.summary}
                             </p>
                         </section>
 
                         {/* Technical Skills */}
-                        <section className="mb-3 page-break-avoid">
-                            <h2 className="text-[11.5px] sm:text-[12px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <section className="mb-2 page-break-avoid">
+                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                 Technical Skills
                             </h2>
-                            <div className="space-y-1 text-[11px] sm:text-[11.5px]">
+                            <div className="space-y-0.5 text-[10.5px] sm:text-[11px]">
                                 {displaySkills.map((sg, i) => (
-                                    <div key={i} className="grid grid-cols-1 sm:grid-cols-[140pt_1fr] items-baseline gap-y-0.5 sm:gap-y-0">
-                                        <span className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{sg.category}:</span>
-                                        <span className="text-gray-800 leading-normal">{sg.items.join(', ')}</span>
+                                    <div key={i} className="grid grid-cols-1 sm:grid-cols-[130pt_1fr] items-baseline gap-y-0.5 sm:gap-y-0">
+                                        <span className="font-bold text-gray-950 text-[10.5px] sm:text-[11px]" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{sg.category}:</span>
+                                        <span className="text-gray-800 leading-snug">{sg.items.join(', ')}</span>
                                     </div>
                                 ))}
                             </div>
                         </section>
 
                         {/* Professional Experience */}
-                        <section className="mb-3">
-                            <h2 className="text-[11.5px] sm:text-[12px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <section className="mb-2">
+                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                 Professional Experience
                             </h2>
-                            <div className="space-y-2.5">
+                            <div className="space-y-1.5">
                                 {displayExperience.map((exp, i) => (
                                     <div key={i} className="page-break-avoid">
                                         <div className="flex justify-between items-baseline flex-wrap gap-x-2">
-                                            <h3 className="font-bold text-gray-950 text-[11.5px] sm:text-[12px]">{exp.role}</h3>
-                                            <span className="text-[10.5px] sm:text-[11px] font-medium text-gray-600 whitespace-nowrap" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.duration}</span>
+                                            <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{exp.role}</h3>
+                                            <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.duration}</span>
                                         </div>
-                                        <div className="text-[10.5px] sm:text-[11px] font-semibold text-blue-900 italic mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.company}</div>
-                                        <ul className="list-disc list-outside ml-4 text-[10.5px] sm:text-[11px] text-gray-800 space-y-0.5 leading-normal">
-                                            {exp.description?.map((d, j) => <li key={j} className="pl-0.5">{d}</li>)}
+                                        <div className="text-[10px] sm:text-[10.5px] font-semibold text-blue-900 italic mb-0.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.company}</div>
+                                        <ul className="list-disc list-outside ml-3.5 text-[10px] sm:text-[10.5px] text-gray-800 space-y-0.5 leading-snug">
+                                            {(exp.description || []).slice(0, 2).map((d, j) => <li key={j} className="pl-0.5">{d}</li>)}
                                         </ul>
                                     </div>
                                 ))}
@@ -803,29 +806,29 @@ const Resume = ({
                         </section>
 
                         {/* Technical Projects */}
-                        <section className="mb-3">
-                            <h2 className="text-[11.5px] sm:text-[12px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <section className="mb-2">
+                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                 Technical Projects
                             </h2>
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 {displayProjects.map((project, i) => (
                                     <div key={i} className="page-break-avoid">
                                         <div className="flex justify-between items-baseline flex-wrap gap-x-2">
                                             <div className="flex items-baseline gap-1.5 flex-wrap">
-                                                <h3 className="font-bold text-gray-950 text-[11.5px] sm:text-[12px]">{project.title}</h3>
+                                                <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{project.title}</h3>
                                                 {project.link && project.link !== '#' && (
                                                     <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer"
-                                                        className="text-[10px] sm:text-[10.5px] text-blue-800 hover:underline"
+                                                        className="text-[9.5px] sm:text-[10px] text-blue-800 hover:underline"
                                                         style={{ fontFamily: '"Courier New", Courier, monospace' }}>
                                                         {formatDisplayUrl(project.link)}
                                                     </a>
                                                 )}
                                             </div>
-                                            <span className="text-[10.5px] sm:text-[11px] text-gray-600 font-medium" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            <span className="text-[10px] sm:text-[10.5px] text-gray-600 font-medium" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                                 {project.tech?.slice(0, 4).join(' • ')}
                                             </span>
                                         </div>
-                                        <p className="text-[10.5px] sm:text-[11px] text-gray-800 leading-normal mt-0.5">{project.description}</p>
+                                        <p className="text-[10px] sm:text-[10.5px] text-gray-800 leading-snug mt-0.5 line-clamp-2">{project.description}</p>
                                     </div>
                                 ))}
                             </div>
@@ -833,18 +836,18 @@ const Resume = ({
 
                         {/* Education */}
                         <section className="page-break-avoid mb-0">
-                            <h2 className="text-[11.5px] sm:text-[12px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                 Education
                             </h2>
-                            <div className="space-y-1.5">
+                            <div className="space-y-1">
                                 {EDUCATION?.map((edu, i) => (
-                                    <div key={i} className="flex justify-between items-start text-[11px] sm:text-[11.5px]">
+                                    <div key={i} className="flex justify-between items-start text-[10.5px] sm:text-[11px]">
                                         <div>
                                             <span className="font-bold text-gray-950">{edu.degree}</span>
                                             <span className="text-gray-700"> — {edu.institution}</span>
                                             {edu.description && <span className="text-gray-600 italic"> ({edu.description})</span>}
                                         </div>
-                                        <span className="text-[10.5px] sm:text-[11px] font-medium text-gray-600 whitespace-nowrap ml-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap ml-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                                             {edu.duration}
                                         </span>
                                     </div>
