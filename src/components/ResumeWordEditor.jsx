@@ -6,6 +6,14 @@ import {
     Save, RefreshCw, Palette, Highlighter, Type, Columns, Maximize2,
     FileText, Plus, Trash2, CheckCircle2, AlertTriangle, Layers, Info
 } from 'lucide-react';
+import {
+    BIO as FALLBACK_BIO,
+    SKILLS as FALLBACK_SKILLS,
+    PROJECTS as FALLBACK_PROJECTS,
+    CONTACT as FALLBACK_CONTACT,
+    EXPERIENCE as FALLBACK_EXPERIENCE,
+    EDUCATION as FALLBACK_EDUCATION
+} from '../constants/content';
 
 const FONT_FAMILIES = [
     { name: 'Georgia (Serif)', value: 'Georgia, Cambria, serif' },
@@ -47,17 +55,25 @@ const HIGHLIGHT_PALETTE = [
 
 // Helper to generate initial HTML from structured data if customHtml is empty
 export const generateTrackHtml = ({ profile, bio, contact, skills, experience, projects, education }) => {
-    const name = bio?.name || 'Abdur Rahman Rafi';
-    const role = profile?.role || bio?.role || 'Software Developer';
-    const address = bio?.address || bio?.location || contact?.address || 'Dhaka, Bangladesh';
-    const phone = contact?.phone || contact?.contactNo || '+880 1700-000000';
-    const email = contact?.email || 'arafi223437@bscse.uiu.ac.bd';
-    const linkedin = contact?.linkedin ? contact.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') : 'linkedin.com/in/rafi1438';
-    const github = contact?.github ? contact.github.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') : 'github.com/Abdur-Rahman-Rafi';
+    const finalBio = (bio && bio.name) ? bio : FALLBACK_BIO;
+    const finalContact = (contact && (contact.email || contact.phone)) ? contact : FALLBACK_CONTACT;
+    const finalSkills = (skills && skills.length > 0) ? skills : FALLBACK_SKILLS;
+    const finalExp = (experience && experience.length > 0) ? experience : FALLBACK_EXPERIENCE;
+    const finalProjects = (projects && projects.length > 0) ? projects : FALLBACK_PROJECTS;
+    const finalEdu = (education && education.length > 0) ? education : FALLBACK_EDUCATION;
+
+    const name = finalBio?.name || 'Abdur Rahman Rafi';
+    const role = profile?.role || finalBio?.role || 'Software Developer';
+    const address = finalBio?.address || finalBio?.location || finalContact?.address || 'Dhaka, Bangladesh';
+    const phone = finalContact?.phone || finalContact?.contactNo || '+880 1700-000000';
+    const email = finalContact?.email || 'arafi223437@bscse.uiu.ac.bd';
+    const linkedin = finalContact?.linkedin ? finalContact.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') : 'linkedin.com/in/rafi1438';
+    const github = finalContact?.github ? finalContact.github.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') : 'github.com/Abdur-Rahman-Rafi';
 
     const targetRoles = profile?.featuredExperienceRoles || [];
-    const sortedExp = [...(experience || [])].sort((a, b) => {
-        const ai = targetRoles.indexOf(a.role), bi = targetRoles.indexOf(b.role);
+    const sortedExp = [...finalExp].sort((a, b) => {
+        const ai = targetRoles.findIndex(r => r.toLowerCase().trim() === (a.role || '').toLowerCase().trim());
+        const bi = targetRoles.findIndex(r => r.toLowerCase().trim() === (b.role || '').toLowerCase().trim());
         if (ai !== -1 && bi !== -1) return ai - bi;
         if (ai !== -1) return -1;
         if (bi !== -1) return 1;
@@ -65,16 +81,22 @@ export const generateTrackHtml = ({ profile, bio, contact, skills, experience, p
     }).slice(0, 3);
 
     const targetProjects = profile?.featuredProjectTitles || [];
-    const sortedProjects = [...(projects || [])].sort((a, b) => {
-        const ai = targetProjects.indexOf(a.title), bi = targetProjects.indexOf(b.title);
-        if (ai !== -1 && bi !== -1) return ai - bi;
-        if (ai !== -1) return -1;
-        if (bi !== -1) return 1;
-        return 0;
-    }).slice(0, 3);
+    const prioritizedProjects = finalProjects.filter(p => targetProjects.some(t => t.trim().toLowerCase() === (p.title || '').trim().toLowerCase()));
+    const remainingProjects = finalProjects.filter(p => !targetProjects.some(t => t.trim().toLowerCase() === (p.title || '').trim().toLowerCase()));
+    const sortedProjects = [...prioritizedProjects, ...remainingProjects].slice(0, 3);
 
     const targetCategories = profile?.skillsCategories || [];
-    const filteredSkills = (skills || []).filter(s => targetCategories.length === 0 || targetCategories.includes(s.category));
+    let filteredSkills = finalSkills.filter(s => {
+        if (targetCategories.length === 0) return true;
+        return targetCategories.some(cat => {
+            const c1 = cat.toLowerCase().trim();
+            const c2 = (s.category || '').toLowerCase().trim();
+            return c1 === c2 || c1.includes(c2) || c2.includes(c1);
+        });
+    });
+    if (filteredSkills.length === 0) {
+        filteredSkills = finalSkills;
+    }
 
     return `<header style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 5pt; margin-bottom: 6pt;">
   <h1 style="font-size: 21pt; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; color: #020617; line-height: 1.15; margin: 0 0 2pt 0;">${name}</h1>
@@ -94,7 +116,7 @@ export const generateTrackHtml = ({ profile, bio, contact, skills, experience, p
 
 <section style="margin-bottom: 6.5pt;">
   <h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">Professional Summary</h2>
-  <p style="font-size: 9.3pt; color: #1f2937; line-height: 1.4; text-align: justify; margin: 0;">${profile?.summary || bio?.summary || ''}</p>
+  <p style="font-size: 9.3pt; color: #1f2937; line-height: 1.4; text-align: justify; margin: 0;">${profile?.summary || finalBio?.summary || ''}</p>
 </section>
 
 <section style="margin-bottom: 6.5pt;">
@@ -139,7 +161,7 @@ export const generateTrackHtml = ({ profile, bio, contact, skills, experience, p
 
 <section style="margin-bottom: 0;">
   <h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">Education</h2>
-  ${(education || []).map(edu => `<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2pt; font-size: 9.3pt;">
+  ${finalEdu.map(edu => `<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2pt; font-size: 9.3pt;">
     <div>
       <span style="font-weight: 700; color: #0f172a;">${edu.degree}</span>
       <span style="color: #374151;"> — ${edu.institution}</span>
@@ -148,6 +170,19 @@ export const generateTrackHtml = ({ profile, bio, contact, skills, experience, p
     <span style="font-family: Arial, sans-serif; font-size: 8.8pt; font-weight: 600; color: #4b5563; white-space: nowrap; margin-left: 8pt;">${edu.duration}</span>
   </div>`).join('')}
 </section>`;
+};
+
+const isCorruptedHtml = (html) => {
+    if (!html || typeof html !== 'string' || html.trim().length < 100) return true;
+    // Check if Technical Skills table was saved with 0 rows
+    if (html.includes('Technical Skills') && (html.includes('<tbody></tbody>') || html.includes('<tbody>\n    </tbody>') || html.includes('<tbody>\r\n    </tbody>'))) {
+        return true;
+    }
+    // Check if Technical Projects was saved with 0 projects
+    if (html.includes('Technical Projects') && !html.includes('display: flex; justify-content: space-between')) {
+        return true;
+    }
+    return false;
 };
 
 const ResumeWordEditor = ({
@@ -174,27 +209,53 @@ const ResumeWordEditor = ({
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     const editorRef = useRef(null);
+    const debouncedUpdateParent = useRef(null);
 
     // Current active profile
     const activeProfile = profiles.find(p => p.id === activeTrackId) || profiles[0];
 
-    // Load content when active track changes or projects update
-    // Always regenerate from live data so projects are always current.
-    // customHtml is preserved via onSaveProfiles only when admin explicitly saves.
+    // Load content when activeTrackId changes
     useEffect(() => {
         if (!activeProfile) return;
-        // If projects are loaded, always regenerate fresh HTML from live data
-        // so the editor reflects the actual current project list.
-        const hasFreshData = projects && projects.length > 0;
-        const initial = hasFreshData
-            ? generateTrackHtml({ profile: activeProfile, bio, contact, skills, experience, projects, education })
-            : (activeProfile.customHtml || generateTrackHtml({ profile: activeProfile, bio, contact, skills, experience, projects, education }));
-        setCurrentHtml(initial);
+        const existing = activeProfile.customHtml;
+
+        let contentToUse = '';
+        if (existing && !isCorruptedHtml(existing)) {
+            contentToUse = existing;
+        } else {
+            contentToUse = generateTrackHtml({
+                profile: activeProfile,
+                bio,
+                contact,
+                skills,
+                experience,
+                projects,
+                education
+            });
+            // Update profile with clean HTML so it's ready to edit and save
+            onProfilesChange(prev => prev.map(p => {
+                if (p.id === activeTrackId) {
+                    return { ...p, customHtml: contentToUse };
+                }
+                return p;
+            }));
+        }
+
+        setCurrentHtml(contentToUse);
         if (editorRef.current) {
-            editorRef.current.innerHTML = initial;
+            editorRef.current.innerHTML = contentToUse;
         }
         setHasUnsavedChanges(false);
-    }, [activeTrackId, activeProfile?.id, projects?.length]);
+    }, [activeTrackId]);
+
+    // Keep editor innerHTML in sync when switching view modes
+    useEffect(() => {
+        if (editorRef.current && (viewMode === 'split' || viewMode === 'editor')) {
+            if (editorRef.current.innerHTML !== currentHtml) {
+                editorRef.current.innerHTML = currentHtml;
+            }
+        }
+    }, [viewMode]);
 
     // Execute rich text formatting command
     const executeCommand = (command, value = null) => {
@@ -204,20 +265,42 @@ const ResumeWordEditor = ({
         handleEditorInput();
     };
 
-    // Keep state updated on typing
+    // Keep state updated on typing with smooth debounced parent state sync
     const handleEditorInput = () => {
         if (!editorRef.current) return;
         const updatedHtml = editorRef.current.innerHTML;
         setCurrentHtml(updatedHtml);
         setHasUnsavedChanges(true);
 
-        // Update profile in parent state
-        onProfilesChange(prev => prev.map(p => {
-            if (p.id === activeTrackId) {
-                return { ...p, customHtml: updatedHtml };
-            }
-            return p;
-        }));
+        if (debouncedUpdateParent.current) {
+            clearTimeout(debouncedUpdateParent.current);
+        }
+        debouncedUpdateParent.current = setTimeout(() => {
+            onProfilesChange(prev => prev.map(p => {
+                if (p.id === activeTrackId) {
+                    return { ...p, customHtml: updatedHtml };
+                }
+                return p;
+            }));
+        }, 300);
+    };
+
+    // Immediate save handler
+    const handleSave = () => {
+        if (debouncedUpdateParent.current) {
+            clearTimeout(debouncedUpdateParent.current);
+        }
+        if (editorRef.current) {
+            const finalHtml = editorRef.current.innerHTML;
+            onProfilesChange(prev => prev.map(p => {
+                if (p.id === activeTrackId) {
+                    return { ...p, customHtml: finalHtml };
+                }
+                return p;
+            }));
+        }
+        setHasUnsavedChanges(false);
+        onSaveProfiles && onSaveProfiles();
     };
 
     // Toggle Public / Locked
@@ -375,7 +458,7 @@ const ResumeWordEditor = ({
                     {/* Save Button */}
                     <button
                         type="button"
-                        onClick={onSaveProfiles}
+                        onClick={handleSave}
                         disabled={saving}
                         className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-md transition-all disabled:opacity-50"
                     >
@@ -783,7 +866,7 @@ const ResumeWordEditor = ({
                     )}
                     <button
                         type="button"
-                        onClick={onSaveProfiles}
+                        onClick={handleSave}
                         disabled={saving}
                         className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-md transition-all disabled:opacity-50"
                     >

@@ -452,7 +452,7 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
 </div>
 
 <div class="cv-sheet">
-${activeProfile?.customHtml ? activeProfile.customHtml : `
+${(activeProfile?.customHtml && activeProfile.customHtml.trim().length > 100 && !activeProfile.customHtml.includes('<tbody></tbody>') && !activeProfile.customHtml.includes('<tbody>\n    </tbody>') && !activeProfile.customHtml.includes('<tbody>\r\n    </tbody>')) ? activeProfile.customHtml : `
 <header>
   <h1 class="cv-name">${name}</h1>
   <p class="cv-role">${role}</p>
@@ -565,10 +565,15 @@ const Resume = ({
     }, [PROJECTS, activeProfile, isCompactMode]);
 
     const displaySkills = React.useMemo(() => {
-        if (!SKILLS || SKILLS.length === 0) return [];
-        if (!activeProfile?.skillsCategories || !isCompactMode) return SKILLS;
-        const filtered = SKILLS.filter(cat => activeProfile.skillsCategories.includes(cat.category));
-        return filtered.length > 0 ? filtered : SKILLS;
+        const allSkills = (SKILLS && SKILLS.length > 0) ? SKILLS : FALLBACK_SKILLS;
+        if (!activeProfile?.skillsCategories || !isCompactMode) return allSkills;
+        const targetCats = activeProfile.skillsCategories;
+        const filtered = allSkills.filter(cat => targetCats.some(tc => {
+            const c1 = tc.toLowerCase().trim();
+            const c2 = (cat.category || '').toLowerCase().trim();
+            return c1 === c2 || c1.includes(c2) || c2.includes(c1);
+        }));
+        return filtered.length > 0 ? filtered : allSkills;
     }, [SKILLS, activeProfile, isCompactMode]);
 
     const displayExperience = React.useMemo(() => {
@@ -797,9 +802,19 @@ const Resume = ({
                             }`}
                             style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', boxSizing: 'border-box' }}
                         >
-                            {/* Always render structured sections — customHtml is used only for PDF export */}
-                            <>
-                                {/* Header */}
+                            {/* Render Word Editor Custom HTML if present & valid, or Default Structured Sections */}
+                            {activeProfile?.customHtml && 
+                             activeProfile.customHtml.trim().length > 100 && 
+                             !activeProfile.customHtml.includes('<tbody></tbody>') && 
+                             !activeProfile.customHtml.includes('<tbody>\n    </tbody>') && 
+                             !activeProfile.customHtml.includes('<tbody>\r\n    </tbody>') ? (
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: activeProfile.customHtml }}
+                                    className="w-full"
+                                />
+                            ) : (
+                                <>
+                                    {/* Header */}
                                     <header className="border-b-2 border-gray-900 pb-2 mb-2 text-center">
                                         <h1 className="text-[22px] sm:text-[24px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5 leading-tight">
                                             {BIO?.name || 'Abdur Rahman Rafi'}
@@ -918,6 +933,7 @@ const Resume = ({
                                         </div>
                                     </section>
                                 </>
+                            )}
                         </div>
                     )}
                 </div>
