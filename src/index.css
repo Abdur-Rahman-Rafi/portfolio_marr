@@ -323,37 +323,30 @@ body {
 
 /* Resume Print Styles */
 @media print {
-
-  /* Ensure the resume modal wrapper is visible and static during print */
-  .resume-modal-wrapper {
-    position: static !important;
-    display: block !important;
-    visibility: visible !important;
-    overflow: visible !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-
   @page {
-    margin: 10mm;
-    /* Give browser some breathing room */
-    size: A4;
+    size: A4 portrait;
+    margin: 0 !important;
   }
 
   /* Reset All Styles for Print */
   html,
   body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
+    width: 210mm !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: white !important;
     color: black !important;
     overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Hide app shell */
-  body>*:not(#root) {
+  body > *:not(#resume-modal-portal) {
+    display: none !important;
+  }
+  #root {
     display: none !important;
   }
 
