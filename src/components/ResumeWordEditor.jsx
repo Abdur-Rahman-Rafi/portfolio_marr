@@ -62,13 +62,17 @@ export const generateTrackHtml = ({ profile, bio, contact, skills, experience, p
     const finalProjects = (projects && projects.length > 0) ? projects : FALLBACK_PROJECTS;
     const finalEdu = (education && education.length > 0) ? education : FALLBACK_EDUCATION;
 
+    const cleanUrl = (url) => (url || '').trim().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+
     const name = finalBio?.name || 'Abdur Rahman Rafi';
     const role = profile?.role || finalBio?.role || 'Software Developer';
     const address = finalBio?.address || finalBio?.location || finalContact?.address || 'Dhaka, Bangladesh';
     const phone = finalContact?.phone || finalContact?.contactNo || '+880 1700-000000';
     const email = finalContact?.email || 'arafi223437@bscse.uiu.ac.bd';
-    const linkedin = finalContact?.linkedin ? finalContact.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') : 'linkedin.com/in/rafi1438';
-    const github = finalContact?.github ? finalContact.github.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '') : 'github.com/Abdur-Rahman-Rafi';
+    const linkedinRaw = finalContact?.linkedin || 'https://www.linkedin.com/in/rafi1438/';
+    const githubRaw = finalContact?.github || 'https://github.com/Abdur-Rahman-Rafi';
+    const linkedin = cleanUrl(linkedinRaw) || 'linkedin.com/in/rafi1438';
+    const github = cleanUrl(githubRaw) || 'github.com/Abdur-Rahman-Rafi';
 
     const targetRoles = profile?.featuredExperienceRoles || [];
     const sortedExp = [...finalExp].sort((a, b) => {
