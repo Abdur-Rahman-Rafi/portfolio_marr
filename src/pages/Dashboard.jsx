@@ -271,11 +271,17 @@ const Dashboard = () => {
         updateActiveProfile('skillsCategories', nextList);
     };
 
-    const saveCvProfilesOnly = async () => {
+    const saveCvProfilesOnly = async (profilesToSave = null) => {
         setSaving(true);
         try {
-            await updateCvProfiles(cvProfiles);
-            showToast('Targeted CV Tracks saved successfully!');
+            const dataToSave = (Array.isArray(profilesToSave) && profilesToSave.length > 0)
+                ? profilesToSave
+                : cvProfiles;
+            await updateCvProfiles(dataToSave);
+            if (Array.isArray(profilesToSave) && profilesToSave.length > 0) {
+                setCvProfiles(profilesToSave);
+            }
+            showToast('Targeted CV Tracks & Word editor layouts saved successfully!');
         } catch (err) {
             console.error('Failed to save CV profiles:', err);
             showToast('Error saving CV profiles', 'error');

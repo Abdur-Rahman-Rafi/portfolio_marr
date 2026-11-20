@@ -290,17 +290,19 @@ const ResumeWordEditor = ({
         if (debouncedUpdateParent.current) {
             clearTimeout(debouncedUpdateParent.current);
         }
-        if (editorRef.current) {
-            const finalHtml = editorRef.current.innerHTML;
-            onProfilesChange(prev => prev.map(p => {
-                if (p.id === activeTrackId) {
-                    return { ...p, customHtml: finalHtml };
-                }
-                return p;
-            }));
-        }
+        const finalHtml = editorRef.current ? editorRef.current.innerHTML : currentHtml;
+        const updatedProfiles = profiles.map(p => {
+            if (p.id === activeTrackId) {
+                return { ...p, customHtml: finalHtml };
+            }
+            return p;
+        });
+
+        onProfilesChange(updatedProfiles);
         setHasUnsavedChanges(false);
-        onSaveProfiles && onSaveProfiles();
+        if (onSaveProfiles) {
+            onSaveProfiles(updatedProfiles);
+        }
     };
 
     // Toggle Public / Locked
