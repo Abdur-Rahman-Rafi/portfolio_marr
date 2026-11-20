@@ -797,15 +797,9 @@ const Resume = ({
                             }`}
                             style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', boxSizing: 'border-box' }}
                         >
-                            {/* Render Word Editor Custom HTML if present, or Default Structured Sections */}
-                            {activeProfile?.customHtml ? (
-                                <div
-                                    dangerouslySetInnerHTML={{ __html: activeProfile.customHtml }}
-                                    className="w-full"
-                                />
-                            ) : (
-                                <>
-                                    {/* Header */}
+                            {/* Always render structured sections — customHtml is used only for PDF export */}
+                            <>
+                                {/* Header */}
                                     <header className="border-b-2 border-gray-900 pb-2 mb-2 text-center">
                                         <h1 className="text-[22px] sm:text-[24px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5 leading-tight">
                                             {BIO?.name || 'Abdur Rahman Rafi'}
@@ -924,7 +918,6 @@ const Resume = ({
                                         </div>
                                     </section>
                                 </>
-                            )}
                         </div>
                     )}
                 </div>
