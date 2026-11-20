@@ -552,10 +552,16 @@ const Resume = ({
     const displayProjects = React.useMemo(() => {
         if (!PROJECTS || PROJECTS.length === 0) return [];
         if (!isCompactMode) return PROJECTS;
+        // Try title-based prioritization first; fall back to any first 3 if no matches
         const targetTitles = activeProfile?.featuredProjectTitles || [];
-        const prioritized = PROJECTS.filter(p => targetTitles.includes(p.title));
-        const remaining = PROJECTS.filter(p => !targetTitles.includes(p.title));
-        return [...prioritized, ...remaining].slice(0, 3);
+        if (targetTitles.length > 0) {
+            const prioritized = PROJECTS.filter(p => targetTitles.some(t => t.trim().toLowerCase() === (p.title || '').trim().toLowerCase()));
+            const remaining = PROJECTS.filter(p => !targetTitles.some(t => t.trim().toLowerCase() === (p.title || '').trim().toLowerCase()));
+            const merged = [...prioritized, ...remaining].slice(0, 3);
+            if (merged.length > 0) return merged;
+        }
+        // Fallback: just return first 3 projects
+        return PROJECTS.slice(0, 3);
     }, [PROJECTS, activeProfile, isCompactMode]);
 
     const displaySkills = React.useMemo(() => {
