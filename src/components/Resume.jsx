@@ -27,12 +27,12 @@ const formatDisplayUrl = (url) => {
 
 const isCorruptedResumeHtml = (html) => {
     if (!html || typeof html !== 'string' || html.trim().length < 150) return true;
-    // Check if Technical Projects was saved with 0 projects
-    if (/Technical Projects<\/h2>\s*<\/section>/i.test(html) || /Technical Projects<\/h2>\s*<section/i.test(html)) {
+    // Check if Technical Projects or Projects was saved with 0 projects
+    if (/(?:Technical\s+)?Projects<\/h2>\s*<\/section>/i.test(html) || /(?:Technical\s+)?Projects<\/h2>\s*<section/i.test(html)) {
         return true;
     }
-    // Check if Technical Skills table was saved with 0 rows
-    if (html.includes('Technical Skills') && (
+    // Check if Technical Skills or Skills table was saved with 0 rows
+    if (/(?:Technical\s+)?Skills/i.test(html) && (
         html.includes('<tbody></tbody>') || 
         html.includes('<tbody>\n    </tbody>') || 
         html.includes('<tbody>\r\n    </tbody>') ||
@@ -40,8 +40,8 @@ const isCorruptedResumeHtml = (html) => {
     )) {
         return true;
     }
-    // Check if Professional Experience was saved with 0 roles
-    if (/Professional Experience<\/h2>\s*<\/section>/i.test(html) || /Professional Experience<\/h2>\s*<section/i.test(html)) {
+    // Check if Professional Experience or Experience was saved with 0 roles
+    if (/(?:Professional\s+)?Experience<\/h2>\s*<\/section>/i.test(html) || /(?:Professional\s+)?Experience<\/h2>\s*<section/i.test(html)) {
         return true;
     }
     return false;
@@ -331,7 +331,7 @@ const Resume = ({
                                     ? 'p-4 sm:p-[10mm_13mm] text-[10.5px] leading-normal'
                                     : 'p-6 sm:p-[14mm_16mm] text-[12px] leading-normal'
                                 }`}
-                            style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', boxSizing: 'border-box' }}
+                            style={{ fontFamily: 'Arial, Helvetica, sans-serif', boxSizing: 'border-box' }}
                         >
                             {/* Render Word Editor Custom HTML if present & valid, or Default Structured Sections */}
                             {activeProfile?.customHtml && !isCorruptedResumeHtml(activeProfile.customHtml) ? (
@@ -342,67 +342,77 @@ const Resume = ({
                             ) : (
                                 <>
                                     {/* Header */}
-                                    <header className="border-b-2 border-gray-900 pb-2 mb-2 text-center">
-                                        <h1 className="text-[22px] sm:text-[24px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5 leading-tight">
+                                    <header className="pb-2 mb-2 text-center" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <h1 className="text-[20px] sm:text-[22px] font-extrabold tracking-normal uppercase text-black mb-0.5 leading-tight">
                                             {BIO?.name || 'Abdur Rahman Rafi'}
                                         </h1>
-                                        <p className="text-[11px] sm:text-[11.5px] font-bold tracking-wider text-blue-900 uppercase mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <p className="text-[9.5px] sm:text-[10px] font-bold tracking-wider text-gray-700 uppercase mb-1">
                                             {activeProfile?.role || BIO?.role}
                                         </p>
-                                        <div className="flex flex-wrap justify-center text-[10px] sm:text-[10.5px] text-gray-700 gap-x-2 gap-y-0.5 leading-tight" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                            {(BIO?.address || BIO?.location || CONTACT?.address) && (
-                                                <span>{BIO?.address || BIO?.location || CONTACT?.address}</span>
-                                            )}
+                                        <div className="flex flex-wrap justify-center items-center text-[9px] sm:text-[9.5px] text-gray-900 gap-x-1.5 gap-y-0.5 leading-tight">
                                             {(() => {
                                                 const phone = CONTACT?.phone || CONTACT?.contactNo || FALLBACK_CONTACT?.phone;
-                                                if (!phone) return null;
-                                                return <><span className="text-gray-400 font-bold">•</span><a href={`tel:${phone}`} className="text-gray-900 hover:underline font-medium">{phone}</a></>;
+                                                const email = CONTACT?.email;
+                                                const linkedin = CONTACT?.linkedin;
+                                                const github = CONTACT?.github;
+                                                const address = BIO?.address || BIO?.location || CONTACT?.address;
+
+                                                const items = [];
+                                                if (phone) items.push(<a key="phone" href={`tel:${phone}`} className="text-black hover:underline">{phone}</a>);
+                                                if (email) items.push(<a key="email" href={`mailto:${email}`} className="text-black hover:underline">{email}</a>);
+                                                if (github) items.push(<a key="github" href={getValidUrl(github)} target="_blank" rel="noopener noreferrer" className="text-black hover:underline">https://{formatDisplayUrl(github) || 'github.com/Abdur-Rahman-Rafi'}</a>);
+                                                if (linkedin) items.push(<a key="linkedin" href={getValidUrl(linkedin)} target="_blank" rel="noopener noreferrer" className="text-black hover:underline">www.{formatDisplayUrl(linkedin) || 'linkedin.com/in/rafi1438'}</a>);
+                                                if (address) items.push(<span key="addr">{address}</span>);
+
+                                                return items.map((el, i) => (
+                                                    <React.Fragment key={i}>
+                                                        {i > 0 && <span className="text-gray-400 font-normal">|</span>}
+                                                        {el}
+                                                    </React.Fragment>
+                                                ));
                                             })()}
-                                            {CONTACT?.email && <><span className="text-gray-400 font-bold">•</span><a href={`mailto:${CONTACT.email}`} className="text-blue-900 hover:underline font-medium">{CONTACT.email}</a></>}
-                                            {CONTACT?.linkedin && <><span className="text-gray-400 font-bold">•</span><a href={getValidUrl(CONTACT.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">{formatDisplayUrl(CONTACT.linkedin) || 'linkedin.com/in/rafi1438'}</a></>}
-                                            {CONTACT?.github && <><span className="text-gray-400 font-bold">•</span><a href={getValidUrl(CONTACT.github)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">{formatDisplayUrl(CONTACT.github) || 'github.com/Abdur-Rahman-Rafi'}</a></>}
                                         </div>
                                     </header>
 
                                     {/* Professional Summary */}
-                                    <section className="mb-2 page-break-avoid">
-                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                            Professional Summary
+                                    <section className="mb-2 page-break-avoid" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-wider text-black mb-1">
+                                            PROFESSIONAL SUMMARY
                                         </h2>
-                                        <p className="text-gray-800 text-justify text-[10.5px] sm:text-[11px] leading-snug">
+                                        <p className="text-gray-900 text-justify text-[9.5px] sm:text-[10px] leading-snug">
                                             {activeProfile?.summary || BIO?.summary}
                                         </p>
                                     </section>
 
                                     {/* Technical Skills */}
-                                    <section className="mb-2 page-break-avoid">
-                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                            Technical Skills
+                                    <section className="mb-2 page-break-avoid" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-wider text-black mb-1">
+                                            SKILLS
                                         </h2>
-                                        <div className="space-y-0.5 text-[10.5px] sm:text-[11px]">
+                                        <div className="space-y-0.5 text-[9.5px] sm:text-[10px]">
                                             {displaySkills.map((sg, i) => (
                                                 <div key={i} className="grid grid-cols-1 sm:grid-cols-[130pt_1fr] items-baseline gap-y-0.5 sm:gap-y-0">
-                                                    <span className="font-bold text-gray-950 text-[10.5px] sm:text-[11px]" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{sg.category}:</span>
-                                                    <span className="text-gray-800 leading-snug">{sg.items.join(', ')}</span>
+                                                    <span className="font-bold text-black text-[9.5px] sm:text-[10px]">{sg.category}:</span>
+                                                    <span className="text-gray-900 leading-snug">{sg.items.join(', ')}</span>
                                                 </div>
                                             ))}
                                         </div>
                                     </section>
 
                                     {/* Professional Experience */}
-                                    <section className="mb-2">
-                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                            Professional Experience
+                                    <section className="mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-wider text-black mb-1.5">
+                                            EXPERIENCE
                                         </h2>
                                         <div className="space-y-1.5">
                                             {displayExperience.map((exp, i) => (
                                                 <div key={i} className="page-break-avoid">
                                                     <div className="flex justify-between items-baseline flex-wrap gap-x-2">
-                                                        <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{exp.role}</h3>
-                                                        <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.duration}</span>
+                                                        <h3 className="font-bold text-black text-[10px] sm:text-[10.5px]">{exp.role}</h3>
+                                                        <span className="text-[9px] sm:text-[9.5px] italic text-gray-700 whitespace-nowrap">{exp.duration}</span>
                                                     </div>
-                                                    <div className="text-[10px] sm:text-[10.5px] font-semibold text-blue-900 italic mb-0.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.company}</div>
-                                                    <ul className="list-disc list-outside ml-3.5 text-[10px] sm:text-[10.5px] text-gray-800 space-y-0.5 leading-snug">
+                                                    <div className="text-[9.5px] sm:text-[10px] font-semibold text-gray-800 italic mb-0.5">{exp.company}</div>
+                                                    <ul className="list-disc list-outside ml-3.5 text-[9.5px] sm:text-[10px] text-gray-900 space-y-0.5 leading-snug">
                                                         {(exp.description || []).slice(0, 2).map((d, j) => <li key={j} className="pl-0.5">{d}</li>)}
                                                     </ul>
                                                 </div>
@@ -411,50 +421,57 @@ const Resume = ({
                                     </section>
 
                                     {/* Technical Projects */}
-                                    <section className="mb-2">
-                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                            Technical Projects
+                                    <section className="mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-wider text-black mb-1.5">
+                                            PROJECTS
                                         </h2>
                                         <div className="space-y-1.5">
-                                            {displayProjects.map((project, i) => (
-                                                <div key={i} className="page-break-avoid">
-                                                    <div className="flex justify-between items-baseline flex-wrap gap-x-2">
-                                                        <div className="flex items-baseline gap-1.5 flex-wrap">
-                                                            <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{project.title}</h3>
+                                            {displayProjects.map((project, i) => {
+                                                const roman = ['i.', 'ii.', 'iii.', 'iv.', 'v.'][i] || `${i + 1}.`;
+                                                return (
+                                                    <div key={i} className="page-break-avoid">
+                                                        <div className="font-bold text-black text-[10px] sm:text-[10.5px] mb-0.5 flex items-baseline gap-1.5 flex-wrap">
+                                                            <span>{roman} {project.title}</span>
                                                             {project.link && project.link !== '#' && (
                                                                 <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer"
-                                                                    className="text-[9.5px] sm:text-[10px] text-blue-800 hover:underline"
-                                                                    style={{ fontFamily: '"Courier New", Courier, monospace' }}>
-                                                                    {formatDisplayUrl(project.link)}
+                                                                    className="font-normal text-[9px] text-gray-600 hover:underline">
+                                                                    ({formatDisplayUrl(project.link)})
                                                                 </a>
                                                             )}
                                                         </div>
-                                                        <span className="text-[10px] sm:text-[10.5px] text-gray-600 font-medium" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                                            {project.tech?.slice(0, 4).join(' • ')}
-                                                        </span>
+                                                        <ul className="list-disc list-outside ml-3.5 text-[9.5px] sm:text-[10px] text-gray-900 space-y-0.5 leading-snug">
+                                                            <li className="pl-0.5">{project.description}</li>
+                                                            {project.tech && project.tech.length > 0 && (
+                                                                <li className="pl-0.5">{project.tech.join(', ')}</li>
+                                                            )}
+                                                        </ul>
                                                     </div>
-                                                    <p className="text-[10px] sm:text-[10.5px] text-gray-800 leading-snug mt-0.5 line-clamp-2">{project.description}</p>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </section>
 
                                     {/* Education */}
-                                    <section className="page-break-avoid mb-0">
-                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                            Education
+                                    <section className="page-break-avoid mb-0" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-wider text-black mb-1">
+                                            EDUCATION
                                         </h2>
                                         <div className="space-y-1">
                                             {EDUCATION?.map((edu, i) => (
-                                                <div key={i} className="flex justify-between items-start text-[10.5px] sm:text-[11px]">
-                                                    <div>
-                                                        <span className="font-bold text-gray-950">{edu.degree}</span>
-                                                        <span className="text-gray-700"> — {edu.institution}</span>
-                                                        {edu.description && <span className="text-gray-600 italic"> ({edu.description})</span>}
+                                                <div key={i} className="text-[9.5px] sm:text-[10px]">
+                                                    <div className="flex justify-between items-baseline flex-wrap">
+                                                        <span className="font-bold text-black">{edu.institution}</span>
+                                                        <span className="font-bold text-black">Dhaka, Bangladesh</span>
                                                     </div>
-                                                    <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap ml-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                                        {edu.duration}
-                                                    </span>
+                                                    <div className="flex justify-between items-baseline flex-wrap">
+                                                        <span className="text-gray-900">{edu.degree}</span>
+                                                        <span className="text-gray-700">{edu.duration}</span>
+                                                    </div>
+                                                    {edu.description && (
+                                                        <ul className="list-disc list-outside ml-3.5 text-[9.5px] sm:text-[10px] text-gray-900 space-y-0.5 leading-snug mt-0.5">
+                                                            <li className="pl-0.5">{edu.description}</li>
+                                                        </ul>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>

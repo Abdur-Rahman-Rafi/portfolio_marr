@@ -16,12 +16,12 @@ import {
 } from '../constants/content';
 
 const FONT_FAMILIES = [
-    { name: 'Georgia (Serif)', value: 'Georgia, Cambria, serif' },
-    { name: 'Times New Roman', value: '"Times New Roman", Times, serif' },
-    { name: 'Arial (Sans-serif)', value: 'Arial, Helvetica, sans-serif' },
+    { name: 'Arial (ATS Standard)', value: 'Arial, Helvetica, sans-serif' },
     { name: 'Calibri (Sans-serif)', value: 'Calibri, sans-serif' },
-    { name: 'Garamond (Serif)', value: 'Garamond, serif' },
     { name: 'Inter (Modern)', value: 'Inter, sans-serif' },
+    { name: 'Times New Roman', value: '"Times New Roman", Times, serif' },
+    { name: 'Georgia (Serif)', value: 'Georgia, Cambria, serif' },
+    { name: 'Garamond (Serif)', value: 'Garamond, serif' },
     { name: 'Courier New (Mono)', value: '"Courier New", Courier, monospace' },
 ];
 
@@ -98,88 +98,99 @@ export const generateTrackHtml = ({ profile, bio, contact, skills, experience, p
         filteredSkills = finalSkills;
     }
 
-    return `<header style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 5pt; margin-bottom: 6pt;">
-  <h1 style="font-size: 21pt; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; color: #020617; line-height: 1.15; margin: 0 0 2pt 0;">${name}</h1>
-  <p style="font-size: 10pt; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: #1d4ed8; font-family: Arial, sans-serif; margin: 0 0 4pt 0;">${role}</p>
-  <div style="font-family: Arial, sans-serif; font-size: 8.8pt; color: #374151; display: flex; flex-wrap: wrap; justify-content: center; gap: 2pt 7pt; line-height: 1.35;">
-    <span>${address}</span>
-    <span style="color: #9ca3af; font-weight: bold;">•</span>
-    <a href="tel:${phone}" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">${phone}</a>
-    <span style="color: #9ca3af; font-weight: bold;">•</span>
-    <a href="mailto:${email}" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">${email}</a>
-    <span style="color: #9ca3af; font-weight: bold;">•</span>
-    <span style="color: #1d4ed8; font-weight: 500;">${linkedin}</span>
-    <span style="color: #9ca3af; font-weight: bold;">•</span>
-    <span style="color: #1d4ed8; font-weight: 500;">${github}</span>
+    const contactParts = [
+        phone ? `<span>${phone}</span>` : '',
+        email ? `<a href="mailto:${email}" style="color: #000000; text-decoration: none;">${email}</a>` : '',
+        githubRaw ? `<a href="${githubRaw}" target="_blank" style="color: #000000; text-decoration: none;">https://${github}</a>` : '',
+        linkedinRaw ? `<a href="${linkedinRaw}" target="_blank" style="color: #000000; text-decoration: none;">www.${linkedin}</a>` : '',
+        address ? `<span>${address}</span>` : ''
+    ].filter(Boolean);
+
+    const romanNumerals = ['i.', 'ii.', 'iii.', 'iv.', 'v.'];
+
+    return `<header style="text-align: center; margin-bottom: 7pt; font-family: Arial, Helvetica, sans-serif;">
+  <h1 style="font-size: 20pt; font-weight: 800; letter-spacing: 0.02em; text-transform: uppercase; color: #000000; line-height: 1.15; margin: 0 0 2pt 0;">${name}</h1>
+  <p style="font-size: 9.5pt; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #374151; margin: 0 0 3pt 0;">${role}</p>
+  <div style="font-size: 8.8pt; color: #111827; display: flex; flex-wrap: wrap; justify-content: center; gap: 2pt 6pt; line-height: 1.3;">
+    ${contactParts.join(' <span style="color: #6b7280; font-weight: 400;">|</span> ')}
   </div>
 </header>
 
-<section style="margin-bottom: 6.5pt;">
-  <h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">Professional Summary</h2>
-  <p style="font-size: 9.3pt; color: #1f2937; line-height: 1.4; text-align: justify; margin: 0;">${profile?.summary || finalBio?.summary || ''}</p>
+<section style="margin-bottom: 7pt; font-family: Arial, Helvetica, sans-serif;">
+  <h2 style="font-size: 10.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #000000; margin: 0 0 3pt 0;">PROFESSIONAL SUMMARY</h2>
+  <p style="font-size: 9pt; color: #111827; line-height: 1.38; text-align: justify; margin: 0;">${profile?.summary || finalBio?.summary || ''}</p>
 </section>
 
-<section style="margin-bottom: 6.5pt;">
-  <h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">Technical Skills</h2>
-  <table style="width: 100%; border-collapse: collapse;">
+<section style="margin-bottom: 7pt; font-family: Arial, Helvetica, sans-serif;">
+  <h2 style="font-size: 10.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #000000; margin: 0 0 3pt 0;">SKILLS</h2>
+  <table style="width: 100%; border-collapse: collapse; font-family: Arial, Helvetica, sans-serif;">
     <tbody>
       ${filteredSkills.map(s => `<tr>
-        <td style="font-family: Arial, sans-serif; font-weight: 700; font-size: 9.3pt; color: #0f172a; white-space: nowrap; padding-right: 8pt; padding-bottom: 1.5pt; vertical-align: top; width: 125pt;">${s.category}:</td>
-        <td style="font-size: 9.3pt; color: #1f2937; line-height: 1.38; padding-bottom: 1.5pt; vertical-align: top;">${s.items?.join(', ')}</td>
+        <td style="font-weight: 700; font-size: 9pt; color: #000000; white-space: nowrap; padding-right: 8pt; padding-bottom: 1.5pt; vertical-align: top; width: 125pt;">${s.category}:</td>
+        <td style="font-size: 9pt; color: #111827; line-height: 1.35; padding-bottom: 1.5pt; vertical-align: top;">${s.items?.join(', ')}</td>
       </tr>`).join('')}
     </tbody>
   </table>
 </section>
 
-<section style="margin-bottom: 6.5pt;">
-  <h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">Professional Experience</h2>
-  ${sortedExp.map(exp => `<div style="margin-bottom: 4pt;">
+<section style="margin-bottom: 7pt; font-family: Arial, Helvetica, sans-serif;">
+  <h2 style="font-size: 10.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #000000; margin: 0 0 3pt 0;">EXPERIENCE</h2>
+  ${sortedExp.map(exp => `<div style="margin-bottom: 4.5pt; font-family: Arial, Helvetica, sans-serif;">
     <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
-      <span style="font-weight: 700; font-size: 9.8pt; color: #0f172a;">${exp.role}</span>
-      <span style="font-family: Arial, sans-serif; font-size: 8.8pt; font-weight: 600; color: #4b5563;">${exp.duration}</span>
+      <span style="font-weight: 700; font-size: 9.5pt; color: #000000;">${exp.role}</span>
+      <span style="font-size: 8.8pt; color: #374151; font-style: italic;">${exp.duration}</span>
     </div>
-    <div style="font-family: Arial, sans-serif; font-size: 9pt; font-weight: 600; color: #1d4ed8; font-style: italic; margin-bottom: 1pt;">${exp.company}</div>
+    <div style="font-size: 9pt; font-weight: 600; color: #1f2937; font-style: italic; margin-bottom: 1.5pt;">${exp.company}</div>
     <ul style="margin: 0 0 0 13pt; padding: 0;">
-      ${(exp.description || []).slice(0, 2).map(d => `<li style="font-size: 9pt; color: #1f2937; line-height: 1.36; margin-bottom: 1pt;">${d}</li>`).join('')}
+      ${(exp.description || []).slice(0, 2).map(d => `<li style="font-size: 9pt; color: #111827; line-height: 1.35; margin-bottom: 1pt;">${d}</li>`).join('')}
     </ul>
   </div>`).join('')}
 </section>
 
-<section style="margin-bottom: 6.5pt;">
-  <h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">Technical Projects</h2>
-  ${sortedProjects.map(p => `<div style="margin-bottom: 3.5pt;">
-    <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 1pt;">
-      <div style="display: flex; align-items: baseline; gap: 5pt; flex-wrap: wrap;">
-        <span style="font-weight: 700; font-size: 9.8pt; color: #0f172a;">${p.title}</span>
-        ${p.link && p.link !== '#' ? `<span style="font-family: 'Courier New', monospace; font-size: 8.2pt; color: #1d4ed8;">(${p.link.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')})</span>` : ''}
-      </div>
-      <span style="font-family: Arial, sans-serif; font-size: 8.8pt; font-weight: 600; color: #4b5563;">${(p.tech || []).slice(0, 4).join(' • ')}</span>
+<section style="margin-bottom: 7pt; font-family: Arial, Helvetica, sans-serif;">
+  <h2 style="font-size: 10.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #000000; margin: 0 0 3pt 0;">PROJECTS</h2>
+  ${sortedProjects.map((p, idx) => {
+    const roman = romanNumerals[idx] || `${idx + 1}.`;
+    const cleanLink = cleanUrl(p.link);
+    return `<div style="margin-bottom: 4pt; font-family: Arial, Helvetica, sans-serif;">
+    <div style="font-weight: 700; font-size: 9.5pt; color: #000000; margin-bottom: 1pt;">
+      <span>${roman} ${p.title}</span>
+      ${cleanLink && p.link !== '#' ? `<span style="font-weight: normal; font-size: 8.5pt; color: #4b5563; margin-left: 6pt;">(${cleanLink})</span>` : ''}
     </div>
-    <p style="font-size: 9pt; color: #1f2937; line-height: 1.35; margin: 0;">${p.description}</p>
-  </div>`).join('')}
+    <ul style="margin: 0 0 0 13pt; padding: 0;">
+      <li style="font-size: 9pt; color: #111827; line-height: 1.35; margin-bottom: 1pt;">${p.description}</li>
+      ${p.tech && p.tech.length > 0 ? `<li style="font-size: 9pt; color: #111827; line-height: 1.35; margin-bottom: 1pt;">${p.tech.join(', ')}</li>` : ''}
+    </ul>
+  </div>`;
+  }).join('')}
 </section>
 
-<section style="margin-bottom: 0;">
-  <h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">Education</h2>
-  ${finalEdu.map(edu => `<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2pt; font-size: 9.3pt;">
-    <div>
-      <span style="font-weight: 700; color: #0f172a;">${edu.degree}</span>
-      <span style="color: #374151;"> — ${edu.institution}</span>
-      ${edu.description ? `<span style="color: #6b7280; font-style: italic; font-size: 8.8pt;"> (${edu.description})</span>` : ''}
+<section style="margin-bottom: 0; font-family: Arial, Helvetica, sans-serif;">
+  <h2 style="font-size: 10.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #000000; margin: 0 0 3pt 0;">EDUCATION</h2>
+  ${finalEdu.map(edu => `<div style="margin-bottom: 3.5pt; font-family: Arial, Helvetica, sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+      <span style="font-weight: 700; font-size: 9.5pt; color: #000000;">${edu.institution}</span>
+      <span style="font-weight: 700; font-size: 9pt; color: #000000;">Dhaka, Bangladesh</span>
     </div>
-    <span style="font-family: Arial, sans-serif; font-size: 8.8pt; font-weight: 600; color: #4b5563; white-space: nowrap; margin-left: 8pt;">${edu.duration}</span>
+    <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+      <span style="font-size: 9pt; color: #111827;">${edu.degree}</span>
+      <span style="font-size: 8.8pt; color: #374151;">${edu.duration}</span>
+    </div>
+    ${edu.description ? `<ul style="margin: 1pt 0 0 13pt; padding: 0;">
+      <li style="font-size: 9pt; color: #111827; line-height: 1.35;">${edu.description}</li>
+    </ul>` : ''}
   </div>`).join('')}
 </section>`;
 };
 
 export const isCorruptedResumeHtml = (html) => {
     if (!html || typeof html !== 'string' || html.trim().length < 150) return true;
-    // Check if Technical Projects was saved with 0 projects
-    if (/Technical Projects<\/h2>\s*<\/section>/i.test(html) || /Technical Projects<\/h2>\s*<section/i.test(html)) {
+    // Check if Technical Projects or Projects was saved with 0 projects
+    if (/(?:Technical\s+)?Projects<\/h2>\s*<\/section>/i.test(html) || /(?:Technical\s+)?Projects<\/h2>\s*<section/i.test(html)) {
         return true;
     }
-    // Check if Technical Skills table was saved with 0 rows
-    if (html.includes('Technical Skills') && (
+    // Check if Technical Skills or Skills table was saved with 0 rows
+    if (/(?:Technical\s+)?Skills/i.test(html) && (
         html.includes('<tbody></tbody>') || 
         html.includes('<tbody>\n    </tbody>') || 
         html.includes('<tbody>\r\n    </tbody>') ||
@@ -187,8 +198,8 @@ export const isCorruptedResumeHtml = (html) => {
     )) {
         return true;
     }
-    // Check if Professional Experience was saved with 0 roles
-    if (/Professional Experience<\/h2>\s*<\/section>/i.test(html) || /Professional Experience<\/h2>\s*<section/i.test(html)) {
+    // Check if Professional Experience or Experience was saved with 0 roles
+    if (/(?:Professional\s+)?Experience<\/h2>\s*<\/section>/i.test(html) || /(?:Professional\s+)?Experience<\/h2>\s*<section/i.test(html)) {
         return true;
     }
     return false;
@@ -370,15 +381,15 @@ const ResumeWordEditor = ({
         if (type === 'heading') {
             const headingTitle = prompt('Enter Section Title:', 'NEW SECTION');
             if (!headingTitle) return;
-            snippet = `<section style="margin-bottom: 6.5pt;"><h2 style="font-family: Arial, sans-serif; font-size: 9.8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; border-bottom: 1.5px solid #1e293b; padding-bottom: 1.5pt; margin: 0 0 3.5pt 0;">${headingTitle}</h2><p style="font-size: 9.3pt; color: #1f2937; line-height: 1.4; margin: 0;">Add your section details here...</p></section>`;
+            snippet = `<section style="margin-bottom: 7pt; font-family: Arial, Helvetica, sans-serif;"><h2 style="font-size: 10.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #000000; margin: 0 0 3pt 0;">${headingTitle}</h2><p style="font-size: 9pt; color: #111827; line-height: 1.35; margin: 0;">Add your section details here...</p></section>`;
         } else if (type === 'experience') {
-            snippet = `<div style="margin-bottom: 4pt;"><div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-weight: 700; font-size: 9.8pt; color: #0f172a;">Software Engineer</span><span style="font-family: Arial, sans-serif; font-size: 8.8pt; font-weight: 600; color: #4b5563;">2024 – Present</span></div><div style="font-family: Arial, sans-serif; font-size: 9pt; font-weight: 600; color: #1d4ed8; font-style: italic; margin-bottom: 1pt;">Company Name</div><ul style="margin: 0 0 0 13pt; padding: 0;"><li style="font-size: 9pt; color: #1f2937; line-height: 1.36; margin-bottom: 1pt;">Key achievement with concrete metrics.</li><li style="font-size: 9pt; color: #1f2937; line-height: 1.36; margin-bottom: 1pt;">Implemented scalable solution using modern architecture.</li></ul></div>`;
+            snippet = `<div style="margin-bottom: 4.5pt; font-family: Arial, Helvetica, sans-serif;"><div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-weight: 700; font-size: 9.5pt; color: #000000;">Software Engineer</span><span style="font-size: 8.8pt; color: #374151; font-style: italic;">2024 – Present</span></div><div style="font-size: 9pt; font-weight: 600; color: #1f2937; font-style: italic; margin-bottom: 1.5pt;">Company Name</div><ul style="margin: 0 0 0 13pt; padding: 0;"><li style="font-size: 9pt; color: #111827; line-height: 1.35; margin-bottom: 1pt;">Key achievement with concrete metrics.</li><li style="font-size: 9pt; color: #111827; line-height: 1.35; margin-bottom: 1pt;">Implemented scalable solution using modern architecture.</li></ul></div>`;
         } else if (type === 'project') {
-            snippet = `<div style="margin-bottom: 3.5pt;"><div style="display: flex; justify-content: space-between; align-items: baseline;"><div style="display: flex; align-items: baseline; gap: 5pt;"><span style="font-weight: 700; font-size: 9.8pt; color: #0f172a;">Project Name</span><span style="font-family: 'Courier New', monospace; font-size: 8.2pt; color: #1d4ed8;">(github.com/project)</span></div><span style="font-family: Arial, sans-serif; font-size: 8.8pt; font-weight: 600; color: #4b5563;">React • Node.js • Cloud</span></div><p style="font-size: 9pt; color: #1f2937; line-height: 1.35; margin: 0;">Engineered full-stack system supporting automated workflows and secure data operations.</p></div>`;
+            snippet = `<div style="margin-bottom: 4pt; font-family: Arial, Helvetica, sans-serif;"><div style="font-weight: 700; font-size: 9.5pt; color: #000000; margin-bottom: 1pt;"><span>i. Project Name</span><span style="font-weight: normal; font-size: 8.5pt; color: #4b5563; margin-left: 6pt;">(github.com/project)</span></div><ul style="margin: 0 0 0 13pt; padding: 0;"><li style="font-size: 9pt; color: #111827; line-height: 1.35; margin-bottom: 1pt;">Engineered full-stack system supporting automated workflows.</li><li style="font-size: 9pt; color: #111827; line-height: 1.35; margin-bottom: 1pt;">React, Node.js, MongoDB, REST APIs</li></ul></div>`;
         } else if (type === 'education') {
-            snippet = `<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2pt; font-size: 9.3pt;"><div><span style="font-weight: 700; color: #0f172a;">Degree Name</span><span style="color: #374151;"> — University Name</span><span style="color: #6b7280; font-style: italic; font-size: 8.8pt;"> (CGPA / Distinction)</span></div><span style="font-family: Arial, sans-serif; font-size: 8.8pt; font-weight: 600; color: #4b5563; white-space: nowrap; margin-left: 8pt;">2020 – 2024</span></div>`;
+            snippet = `<div style="margin-bottom: 3.5pt; font-family: Arial, Helvetica, sans-serif;"><div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-weight: 700; font-size: 9.5pt; color: #000000;">University Name</span><span style="font-weight: 700; font-size: 9pt; color: #000000;">Dhaka, Bangladesh</span></div><div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 9pt; color: #111827;">Degree Name</span><span style="font-size: 8.8pt; color: #374151;">2020 – 2024</span></div></div>`;
         } else if (type === 'divider') {
-            snippet = `<hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 5pt 0;" />`;
+            snippet = `<hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 4pt 0;" />`;
         }
 
         if (snippet && editorRef.current) {
@@ -535,7 +546,7 @@ const ResumeWordEditor = ({
                         <select
                             onChange={(e) => executeCommand('fontName', e.target.value)}
                             className="bg-slate-900/90 text-slate-200 border border-slate-700 rounded-lg px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"
-                            defaultValue="Georgia, Cambria, serif"
+                            defaultValue="Arial, Helvetica, sans-serif"
                         >
                             {FONT_FAMILIES.map((f, i) => (
                                 <option key={i} value={f.value}>{f.name}</option>
@@ -768,10 +779,10 @@ const ResumeWordEditor = ({
                             <button
                                 type="button"
                                 onClick={handleResetLayout}
-                                className="flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs"
-                                title="Reset this track to default verified 1-page template"
+                                className="flex items-center gap-1.5 px-3 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-lg text-xs font-semibold transition-all shadow-sm"
+                                title="Reset track to clean minimal ATS template (UIU Standard)"
                             >
-                                <RefreshCw size={12} /> Reset to Default Template
+                                <RefreshCw size={12} /> Apply Clean Minimal ATS Layout
                             </button>
                         </div>
                     </div>
@@ -805,7 +816,7 @@ const ResumeWordEditor = ({
                                     suppressContentEditableWarning={true}
                                     className="w-full max-w-[210mm] min-h-[297mm] bg-white text-gray-900 shadow-2xl p-[10mm_13mm] text-[10.5px] leading-normal outline-none focus:ring-2 focus:ring-blue-500/50 rounded-sm"
                                     style={{
-                                        fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif',
+                                        fontFamily: 'Arial, Helvetica, sans-serif',
                                         boxSizing: 'border-box'
                                     }}
                                 />
@@ -832,7 +843,7 @@ const ResumeWordEditor = ({
                                 <div
                                     className="w-full max-w-[210mm] min-h-[297mm] bg-white text-gray-900 shadow-2xl p-[10mm_13mm] text-[10.5px] leading-normal rounded-sm pointer-events-auto"
                                     style={{
-                                        fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif',
+                                        fontFamily: 'Arial, Helvetica, sans-serif',
                                         boxSizing: 'border-box'
                                     }}
                                     dangerouslySetInnerHTML={{ __html: currentHtml }}
