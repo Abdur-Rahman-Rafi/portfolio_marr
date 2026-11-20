@@ -178,24 +178,23 @@ const ResumeWordEditor = ({
     // Current active profile
     const activeProfile = profiles.find(p => p.id === activeTrackId) || profiles[0];
 
-    // Load content when active track changes
+    // Load content when active track changes or projects update
+    // Always regenerate from live data so projects are always current.
+    // customHtml is preserved via onSaveProfiles only when admin explicitly saves.
     useEffect(() => {
         if (!activeProfile) return;
-        const initial = activeProfile.customHtml || generateTrackHtml({
-            profile: activeProfile,
-            bio,
-            contact,
-            skills,
-            experience,
-            projects,
-            education
-        });
+        // If projects are loaded, always regenerate fresh HTML from live data
+        // so the editor reflects the actual current project list.
+        const hasFreshData = projects && projects.length > 0;
+        const initial = hasFreshData
+            ? generateTrackHtml({ profile: activeProfile, bio, contact, skills, experience, projects, education })
+            : (activeProfile.customHtml || generateTrackHtml({ profile: activeProfile, bio, contact, skills, experience, projects, education }));
         setCurrentHtml(initial);
         if (editorRef.current) {
             editorRef.current.innerHTML = initial;
         }
         setHasUnsavedChanges(false);
-    }, [activeTrackId, activeProfile?.id]);
+    }, [activeTrackId, activeProfile?.id, projects?.length]);
 
     // Execute rich text formatting command
     const executeCommand = (command, value = null) => {
