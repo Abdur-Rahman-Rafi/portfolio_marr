@@ -300,6 +300,18 @@ body {
   transition: width 1s ease-in-out;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hidden,
+.overflow-x-auto.scrollbar-hidden,
+.resume-track-tabs {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.resume-track-tabs::-webkit-scrollbar,
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 /* Resume Paper Styles - Global Enforcement */
 .resume-paper {
   background-color: #ffffff !important;
