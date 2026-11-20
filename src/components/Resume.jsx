@@ -10,7 +10,7 @@ import {
     DEFAULT_CV_PROFILES
 } from '../constants/content';
 import { getCvProfiles } from '../services/portfolioService';
-import { Download, X, CheckCircle2, Sliders, Sparkles, Printer } from 'lucide-react';
+import { Download, X, CheckCircle2, Sliders, Sparkles, Printer, Lock, Star } from 'lucide-react';
 
 // ─── Utility helpers ──────────────────────────────────────────────────────────
 const getValidUrl = (url) => {
@@ -452,7 +452,7 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
 </div>
 
 <div class="cv-sheet">
-
+${activeProfile?.customHtml ? activeProfile.customHtml : `
 <header>
   <h1 class="cv-name">${name}</h1>
   <p class="cv-role">${role}</p>
@@ -489,7 +489,7 @@ const buildResumeHTML = ({ BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION
   <h2 class="sec-head">Education</h2>
   ${eduRows}
 </section>
-
+`}
 </div>
 
 <script>
@@ -513,19 +513,40 @@ const Resume = ({
     contact: CONTACT = FALLBACK_CONTACT,
     experience: EXPERIENCE = FALLBACK_EXPERIENCE,
     education: EDUCATION = FALLBACK_EDUCATION,
-    initialTrack = 'software'
+    initialTrack
 }) => {
     const [profiles, setProfiles] = useState(DEFAULT_CV_PROFILES);
-    const [activeTrack, setActiveTrack] = useState(initialTrack);
+    const [activeTrack, setActiveTrack] = useState(initialTrack || 'software');
     const [isCompactMode, setIsCompactMode] = useState(true);
 
     useEffect(() => {
         getCvProfiles().then(fetched => {
-            if (fetched && fetched.length > 0) setProfiles(fetched);
+            if (fetched && fetched.length > 0) {
+                setProfiles(fetched);
+                // If initialTrack was not explicitly passed, pick the featured profile or first public profile
+                if (!initialTrack) {
+                    const featured = fetched.find(p => p.isFeatured && p.isPublic !== false);
+                    const firstPublic = fetched.find(p => p.isPublic !== false);
+                    if (featured) {
+                        setActiveTrack(featured.id);
+                    } else if (firstPublic) {
+                        setActiveTrack(firstPublic.id);
+                    }
+                }
+            }
         }).catch(() => {});
-    }, []);
+    }, [initialTrack]);
 
-    const activeProfile = profiles.find(p => p.id === activeTrack) || profiles[0] || DEFAULT_CV_PROFILES[0];
+    // Filter profiles for visitors:
+    // Only public profiles (isPublic !== false) are visible to normal visitors
+    const publicProfiles = React.useMemo(() => {
+        const filtered = profiles.filter(p => p.isPublic !== false);
+        return filtered.length > 0 ? filtered : profiles;
+    }, [profiles]);
+
+    // Current active profile
+    const activeProfile = profiles.find(p => p.id === activeTrack) || publicProfiles[0] || profiles[0] || DEFAULT_CV_PROFILES[0];
+    const isLocked = activeProfile?.isPublic === false;
 
     // ── Filtered data ─────────────────────────────────────────────────────────
     const displayProjects = React.useMemo(() => {
@@ -564,6 +585,10 @@ const Resume = ({
 
     // ── Open dedicated print window via Blob URL (no about:blank, 100% text A4) ─
     const openPrintWindow = () => {
+        if (isLocked) {
+            alert('This CV profile is locked by the administrator and cannot be exported.');
+            return;
+        }
         const html = buildResumeHTML({
             BIO, SKILLS, PROJECTS, CONTACT, EXPERIENCE, EDUCATION,
             activeProfile, displaySkills, displayExperience, displayProjects,
@@ -578,7 +603,13 @@ const Resume = ({
     };
 
     // ── Native print for in-page preview ──────────────────────────────────────
-    const handleNativePrint = () => window.print();
+    const handleNativePrint = () => {
+        if (isLocked) {
+            alert('This CV profile is locked by the administrator.');
+            return;
+        }
+        window.print();
+    };
 
     if (!BIO || !EXPERIENCE || !EDUCATION) {
         return (
@@ -658,17 +689,18 @@ const Resume = ({
                                 <Sparkles size={12} className="text-blue-400" /> Track:
                             </span>
                             <div className="flex items-center gap-1.5">
-                                {profiles.map(p => (
+                                {publicProfiles.map(p => (
                                     <button
                                         key={p.id}
                                         onClick={() => setActiveTrack(p.id)}
-                                        className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                                        className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
                                             activeTrack === p.id
                                                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                                                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
                                         }`}
                                     >
-                                        {p.badge || p.name}
+                                        {p.isFeatured && <Star size={11} className="text-yellow-300 fill-yellow-300" />}
+                                        <span>{p.badge || p.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -701,7 +733,8 @@ const Resume = ({
                             {/* PRIMARY: opens new window with Blob URL → 100% text A4 PDF without timing/URLs */}
                             <button
                                 onClick={openPrintWindow}
-                                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-1.5 rounded-xl shadow-lg transition-all"
+                                disabled={isLocked}
+                                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-1.5 rounded-xl shadow-lg transition-all disabled:opacity-40"
                                 title="Download as text-based A4 PDF (ATS-safe, zero headers/footers)"
                             >
                                 <Download size={14} /> Download PDF (ATS)
@@ -710,7 +743,8 @@ const Resume = ({
                             {/* SECONDARY: print preview */}
                             <button
                                 onClick={handleNativePrint}
-                                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-3.5 py-1.5 rounded-xl border border-slate-700 transition-all"
+                                disabled={isLocked}
+                                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-3.5 py-1.5 rounded-xl border border-slate-700 transition-all disabled:opacity-40"
                                 title="Print this preview"
                             >
                                 <Printer size={13} /> Print Preview
@@ -724,137 +758,169 @@ const Resume = ({
                     </p>
                 </div>
 
-                {/* ── Calibrated Full-Page A4 Resume Preview ── */}
+                {/* ── Content View: Locked Screen vs Active Resume Document ── */}
                 <div className="w-full overflow-x-auto flex justify-center pb-8 print:p-0 print:overflow-visible">
-                    <div
-                        id="resume-pdf-content"
-                        onClick={e => e.stopPropagation()}
-                        className={`resume-paper w-full max-w-[210mm] bg-white text-gray-900 shadow-2xl rounded-none pointer-events-auto transition-all ${
-                            isCompactMode
-                                ? 'p-4 sm:p-[10mm_13mm] text-[10.5px] leading-normal'
-                                : 'p-6 sm:p-[14mm_16mm] text-[12px] leading-normal'
-                        }`}
-                        style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', boxSizing: 'border-box' }}
-                    >
-                        {/* Header */}
-                        <header className="border-b-2 border-gray-900 pb-2 mb-2 text-center">
-                            <h1 className="text-[22px] sm:text-[24px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5 leading-tight">
-                                {BIO?.name || 'Abdur Rahman Rafi'}
-                            </h1>
-                            <p className="text-[11px] sm:text-[11.5px] font-bold tracking-wider text-blue-900 uppercase mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                {activeProfile?.role || BIO?.role}
+                    {isLocked ? (
+                        <div className="p-8 sm:p-12 text-center bg-white border border-slate-200 shadow-2xl rounded-none w-full max-w-[210mm] my-4 isolate">
+                            <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mb-4">
+                                <Lock size={28} />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 mb-1.5">Restricted CV Track</h3>
+                            <p className="text-xs text-slate-600 max-w-md mx-auto mb-6 leading-relaxed">
+                                This resume track (<strong>{activeProfile?.name}</strong>) is currently locked by the administrator. Only public featured CVs are available for download.
                             </p>
-                            <div className="flex flex-wrap justify-center text-[10px] sm:text-[10.5px] text-gray-700 gap-x-2 gap-y-0.5 leading-tight" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                {(BIO?.address || BIO?.location || CONTACT?.address) && (
-                                    <span>{BIO?.address || BIO?.location || CONTACT?.address}</span>
-                                )}
-                                {(() => {
-                                    const phone = CONTACT?.phone || CONTACT?.contactNo || FALLBACK_CONTACT?.phone;
-                                    if (!phone) return null;
-                                    return <><span className="text-gray-400 font-bold">•</span><a href={`tel:${phone}`} className="text-gray-900 hover:underline font-medium">{phone}</a></>;
-                                })()}
-                                {CONTACT?.email && <><span className="text-gray-400 font-bold">•</span><a href={`mailto:${CONTACT.email}`} className="text-blue-900 hover:underline font-medium">{CONTACT.email}</a></>}
-                                {CONTACT?.linkedin && <><span className="text-gray-400 font-bold">•</span><a href={getValidUrl(CONTACT.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">{formatDisplayUrl(CONTACT.linkedin) || 'linkedin.com/in/rafi1438'}</a></>}
-                                {CONTACT?.github && <><span className="text-gray-400 font-bold">•</span><a href={getValidUrl(CONTACT.github)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">{formatDisplayUrl(CONTACT.github) || 'github.com/Abdur-Rahman-Rafi'}</a></>}
-                            </div>
-                        </header>
-
-                        {/* Professional Summary */}
-                        <section className="mb-2 page-break-avoid">
-                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                Professional Summary
-                            </h2>
-                            <p className="text-gray-800 text-justify text-[10.5px] sm:text-[11px] leading-snug">
-                                {activeProfile?.summary || BIO?.summary}
-                            </p>
-                        </section>
-
-                        {/* Technical Skills */}
-                        <section className="mb-2 page-break-avoid">
-                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                Technical Skills
-                            </h2>
-                            <div className="space-y-0.5 text-[10.5px] sm:text-[11px]">
-                                {displaySkills.map((sg, i) => (
-                                    <div key={i} className="grid grid-cols-1 sm:grid-cols-[130pt_1fr] items-baseline gap-y-0.5 sm:gap-y-0">
-                                        <span className="font-bold text-gray-950 text-[10.5px] sm:text-[11px]" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{sg.category}:</span>
-                                        <span className="text-gray-800 leading-snug">{sg.items.join(', ')}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Professional Experience */}
-                        <section className="mb-2">
-                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                Professional Experience
-                            </h2>
-                            <div className="space-y-1.5">
-                                {displayExperience.map((exp, i) => (
-                                    <div key={i} className="page-break-avoid">
-                                        <div className="flex justify-between items-baseline flex-wrap gap-x-2">
-                                            <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{exp.role}</h3>
-                                            <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.duration}</span>
+                            <button
+                                onClick={() => {
+                                    const featured = profiles.find(p => p.isFeatured && p.isPublic !== false) || publicProfiles[0];
+                                    if (featured) setActiveTrack(featured.id);
+                                }}
+                                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md transition-all inline-flex items-center gap-2"
+                            >
+                                <Star size={14} className="fill-yellow-300 text-yellow-300" />
+                                Switch to Featured Public CV ({profiles.find(p => p.isFeatured)?.badge || 'Featured'})
+                            </button>
+                        </div>
+                    ) : (
+                        <div
+                            id="resume-pdf-content"
+                            onClick={e => e.stopPropagation()}
+                            className={`resume-paper w-full max-w-[210mm] bg-white text-gray-900 shadow-2xl rounded-none pointer-events-auto transition-all ${
+                                isCompactMode
+                                    ? 'p-4 sm:p-[10mm_13mm] text-[10.5px] leading-normal'
+                                    : 'p-6 sm:p-[14mm_16mm] text-[12px] leading-normal'
+                            }`}
+                            style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', boxSizing: 'border-box' }}
+                        >
+                            {/* Render Word Editor Custom HTML if present, or Default Structured Sections */}
+                            {activeProfile?.customHtml ? (
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: activeProfile.customHtml }}
+                                    className="w-full"
+                                />
+                            ) : (
+                                <>
+                                    {/* Header */}
+                                    <header className="border-b-2 border-gray-900 pb-2 mb-2 text-center">
+                                        <h1 className="text-[22px] sm:text-[24px] font-extrabold tracking-tight uppercase text-gray-950 mb-0.5 leading-tight">
+                                            {BIO?.name || 'Abdur Rahman Rafi'}
+                                        </h1>
+                                        <p className="text-[11px] sm:text-[11.5px] font-bold tracking-wider text-blue-900 uppercase mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            {activeProfile?.role || BIO?.role}
+                                        </p>
+                                        <div className="flex flex-wrap justify-center text-[10px] sm:text-[10.5px] text-gray-700 gap-x-2 gap-y-0.5 leading-tight" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            {(BIO?.address || BIO?.location || CONTACT?.address) && (
+                                                <span>{BIO?.address || BIO?.location || CONTACT?.address}</span>
+                                            )}
+                                            {(() => {
+                                                const phone = CONTACT?.phone || CONTACT?.contactNo || FALLBACK_CONTACT?.phone;
+                                                if (!phone) return null;
+                                                return <><span className="text-gray-400 font-bold">•</span><a href={`tel:${phone}`} className="text-gray-900 hover:underline font-medium">{phone}</a></>;
+                                            })()}
+                                            {CONTACT?.email && <><span className="text-gray-400 font-bold">•</span><a href={`mailto:${CONTACT.email}`} className="text-blue-900 hover:underline font-medium">{CONTACT.email}</a></>}
+                                            {CONTACT?.linkedin && <><span className="text-gray-400 font-bold">•</span><a href={getValidUrl(CONTACT.linkedin)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">{formatDisplayUrl(CONTACT.linkedin) || 'linkedin.com/in/rafi1438'}</a></>}
+                                            {CONTACT?.github && <><span className="text-gray-400 font-bold">•</span><a href={getValidUrl(CONTACT.github)} target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:underline font-medium">{formatDisplayUrl(CONTACT.github) || 'github.com/Abdur-Rahman-Rafi'}</a></>}
                                         </div>
-                                        <div className="text-[10px] sm:text-[10.5px] font-semibold text-blue-900 italic mb-0.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.company}</div>
-                                        <ul className="list-disc list-outside ml-3.5 text-[10px] sm:text-[10.5px] text-gray-800 space-y-0.5 leading-snug">
-                                            {(exp.description || []).slice(0, 2).map((d, j) => <li key={j} className="pl-0.5">{d}</li>)}
-                                        </ul>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
+                                    </header>
 
-                        {/* Technical Projects */}
-                        <section className="mb-2">
-                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                Technical Projects
-                            </h2>
-                            <div className="space-y-1.5">
-                                {displayProjects.map((project, i) => (
-                                    <div key={i} className="page-break-avoid">
-                                        <div className="flex justify-between items-baseline flex-wrap gap-x-2">
-                                            <div className="flex items-baseline gap-1.5 flex-wrap">
-                                                <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{project.title}</h3>
-                                                {project.link && project.link !== '#' && (
-                                                    <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer"
-                                                        className="text-[9.5px] sm:text-[10px] text-blue-800 hover:underline"
-                                                        style={{ fontFamily: '"Courier New", Courier, monospace' }}>
-                                                        {formatDisplayUrl(project.link)}
-                                                    </a>
-                                                )}
-                                            </div>
-                                            <span className="text-[10px] sm:text-[10.5px] text-gray-600 font-medium" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                                {project.tech?.slice(0, 4).join(' • ')}
-                                            </span>
-                                        </div>
-                                        <p className="text-[10px] sm:text-[10.5px] text-gray-800 leading-snug mt-0.5 line-clamp-2">{project.description}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
+                                    {/* Professional Summary */}
+                                    <section className="mb-2 page-break-avoid">
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            Professional Summary
+                                        </h2>
+                                        <p className="text-gray-800 text-justify text-[10.5px] sm:text-[11px] leading-snug">
+                                            {activeProfile?.summary || BIO?.summary}
+                                        </p>
+                                    </section>
 
-                        {/* Education */}
-                        <section className="page-break-avoid mb-0">
-                            <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                Education
-                            </h2>
-                            <div className="space-y-1">
-                                {EDUCATION?.map((edu, i) => (
-                                    <div key={i} className="flex justify-between items-start text-[10.5px] sm:text-[11px]">
-                                        <div>
-                                            <span className="font-bold text-gray-950">{edu.degree}</span>
-                                            <span className="text-gray-700"> — {edu.institution}</span>
-                                            {edu.description && <span className="text-gray-600 italic"> ({edu.description})</span>}
+                                    {/* Technical Skills */}
+                                    <section className="mb-2 page-break-avoid">
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            Technical Skills
+                                        </h2>
+                                        <div className="space-y-0.5 text-[10.5px] sm:text-[11px]">
+                                            {displaySkills.map((sg, i) => (
+                                                <div key={i} className="grid grid-cols-1 sm:grid-cols-[130pt_1fr] items-baseline gap-y-0.5 sm:gap-y-0">
+                                                    <span className="font-bold text-gray-950 text-[10.5px] sm:text-[11px]" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{sg.category}:</span>
+                                                    <span className="text-gray-800 leading-snug">{sg.items.join(', ')}</span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap ml-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                                            {edu.duration}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    </div>
+                                    </section>
+
+                                    {/* Professional Experience */}
+                                    <section className="mb-2">
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            Professional Experience
+                                        </h2>
+                                        <div className="space-y-1.5">
+                                            {displayExperience.map((exp, i) => (
+                                                <div key={i} className="page-break-avoid">
+                                                    <div className="flex justify-between items-baseline flex-wrap gap-x-2">
+                                                        <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{exp.role}</h3>
+                                                        <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.duration}</span>
+                                                    </div>
+                                                    <div className="text-[10px] sm:text-[10.5px] font-semibold text-blue-900 italic mb-0.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>{exp.company}</div>
+                                                    <ul className="list-disc list-outside ml-3.5 text-[10px] sm:text-[10.5px] text-gray-800 space-y-0.5 leading-snug">
+                                                        {(exp.description || []).slice(0, 2).map((d, j) => <li key={j} className="pl-0.5">{d}</li>)}
+                                                    </ul>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    {/* Technical Projects */}
+                                    <section className="mb-2">
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1.5" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            Technical Projects
+                                        </h2>
+                                        <div className="space-y-1.5">
+                                            {displayProjects.map((project, i) => (
+                                                <div key={i} className="page-break-avoid">
+                                                    <div className="flex justify-between items-baseline flex-wrap gap-x-2">
+                                                        <div className="flex items-baseline gap-1.5 flex-wrap">
+                                                            <h3 className="font-bold text-gray-950 text-[11px] sm:text-[11.5px]">{project.title}</h3>
+                                                            {project.link && project.link !== '#' && (
+                                                                <a href={getValidUrl(project.link)} target="_blank" rel="noreferrer"
+                                                                    className="text-[9.5px] sm:text-[10px] text-blue-800 hover:underline"
+                                                                    style={{ fontFamily: '"Courier New", Courier, monospace' }}>
+                                                                    {formatDisplayUrl(project.link)}
+                                                                </a>
+                                                            )}
+                                                        </div>
+                                                        <span className="text-[10px] sm:text-[10.5px] text-gray-600 font-medium" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                                            {project.tech?.slice(0, 4).join(' • ')}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[10px] sm:text-[10.5px] text-gray-800 leading-snug mt-0.5 line-clamp-2">{project.description}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    {/* Education */}
+                                    <section className="page-break-avoid mb-0">
+                                        <h2 className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-950 border-b border-gray-400 pb-0.5 mb-1" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                            Education
+                                        </h2>
+                                        <div className="space-y-1">
+                                            {EDUCATION?.map((edu, i) => (
+                                                <div key={i} className="flex justify-between items-start text-[10.5px] sm:text-[11px]">
+                                                    <div>
+                                                        <span className="font-bold text-gray-950">{edu.degree}</span>
+                                                        <span className="text-gray-700"> — {edu.institution}</span>
+                                                        {edu.description && <span className="text-gray-600 italic"> ({edu.description})</span>}
+                                                    </div>
+                                                    <span className="text-[10px] sm:text-[10.5px] font-medium text-gray-600 whitespace-nowrap ml-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                                        {edu.duration}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>,
