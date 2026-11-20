@@ -172,14 +172,23 @@ export const generateTrackHtml = ({ profile, bio, contact, skills, experience, p
 </section>`;
 };
 
-const isCorruptedHtml = (html) => {
-    if (!html || typeof html !== 'string' || html.trim().length < 100) return true;
-    // Check if Technical Skills table was saved with 0 rows
-    if (html.includes('Technical Skills') && (html.includes('<tbody></tbody>') || html.includes('<tbody>\n    </tbody>') || html.includes('<tbody>\r\n    </tbody>'))) {
+export const isCorruptedResumeHtml = (html) => {
+    if (!html || typeof html !== 'string' || html.trim().length < 150) return true;
+    // Check if Technical Projects was saved with 0 projects
+    if (/Technical Projects<\/h2>\s*<\/section>/i.test(html) || /Technical Projects<\/h2>\s*<section/i.test(html)) {
         return true;
     }
-    // Check if Technical Projects was saved with 0 projects
-    if (html.includes('Technical Projects') && !html.includes('display: flex; justify-content: space-between')) {
+    // Check if Technical Skills table was saved with 0 rows
+    if (html.includes('Technical Skills') && (
+        html.includes('<tbody></tbody>') || 
+        html.includes('<tbody>\n    </tbody>') || 
+        html.includes('<tbody>\r\n    </tbody>') ||
+        /<tbody>\s*<\/tbody>/i.test(html)
+    )) {
+        return true;
+    }
+    // Check if Professional Experience was saved with 0 roles
+    if (/Professional Experience<\/h2>\s*<\/section>/i.test(html) || /Professional Experience<\/h2>\s*<section/i.test(html)) {
         return true;
     }
     return false;
@@ -220,7 +229,7 @@ const ResumeWordEditor = ({
         const existing = activeProfile.customHtml;
 
         let contentToUse = '';
-        if (existing && !isCorruptedHtml(existing)) {
+        if (existing && !isCorruptedResumeHtml(existing)) {
             contentToUse = existing;
         } else {
             contentToUse = generateTrackHtml({

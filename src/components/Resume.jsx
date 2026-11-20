@@ -25,6 +25,28 @@ const formatDisplayUrl = (url) => {
     return url.trim().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 };
 
+const isCorruptedResumeHtml = (html) => {
+    if (!html || typeof html !== 'string' || html.trim().length < 150) return true;
+    // Check if Technical Projects was saved with 0 projects
+    if (/Technical Projects<\/h2>\s*<\/section>/i.test(html) || /Technical Projects<\/h2>\s*<section/i.test(html)) {
+        return true;
+    }
+    // Check if Technical Skills table was saved with 0 rows
+    if (html.includes('Technical Skills') && (
+        html.includes('<tbody></tbody>') || 
+        html.includes('<tbody>\n    </tbody>') || 
+        html.includes('<tbody>\r\n    </tbody>') ||
+        /<tbody>\s*<\/tbody>/i.test(html)
+    )) {
+        return true;
+    }
+    // Check if Professional Experience was saved with 0 roles
+    if (/Professional Experience<\/h2>\s*<\/section>/i.test(html) || /Professional Experience<\/h2>\s*<section/i.test(html)) {
+        return true;
+    }
+    return false;
+};
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Resume = ({
     onClose,
@@ -55,7 +77,7 @@ const Resume = ({
                     }
                 }
             }
-        }).catch(() => {});
+        }).catch(() => { });
     }, [initialTrack]);
 
     // Filter profiles for visitors:
@@ -215,11 +237,10 @@ const Resume = ({
                                     <button
                                         key={p.id}
                                         onClick={() => setActiveTrack(p.id)}
-                                        className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                                            activeTrack === p.id
+                                        className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${activeTrack === p.id
                                                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                                                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
-                                        }`}
+                                            }`}
                                     >
                                         {p.isFeatured && <Star size={11} className="text-yellow-300 fill-yellow-300" />}
                                         <span>{p.badge || p.name}</span>
@@ -306,19 +327,14 @@ const Resume = ({
                         <div
                             id="resume-pdf-content"
                             onClick={e => e.stopPropagation()}
-                            className={`resume-paper w-full max-w-[210mm] bg-white text-gray-900 shadow-2xl rounded-none pointer-events-auto transition-all ${
-                                isCompactMode
+                            className={`resume-paper w-full max-w-[210mm] bg-white text-gray-900 shadow-2xl rounded-none pointer-events-auto transition-all ${isCompactMode
                                     ? 'p-4 sm:p-[10mm_13mm] text-[10.5px] leading-normal'
                                     : 'p-6 sm:p-[14mm_16mm] text-[12px] leading-normal'
-                            }`}
+                                }`}
                             style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif', boxSizing: 'border-box' }}
                         >
                             {/* Render Word Editor Custom HTML if present & valid, or Default Structured Sections */}
-                            {activeProfile?.customHtml && 
-                             activeProfile.customHtml.trim().length > 100 && 
-                             !activeProfile.customHtml.includes('<tbody></tbody>') && 
-                             !activeProfile.customHtml.includes('<tbody>\n    </tbody>') && 
-                             !activeProfile.customHtml.includes('<tbody>\r\n    </tbody>') ? (
+                            {activeProfile?.customHtml && !isCorruptedResumeHtml(activeProfile.customHtml) ? (
                                 <div
                                     dangerouslySetInnerHTML={{ __html: activeProfile.customHtml }}
                                     className="w-full"
